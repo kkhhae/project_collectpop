@@ -250,7 +250,7 @@ public class AdminController {
         adminService.addDeclaration(declaration);
         return new ResponseEntity<>("신고 접수되었습니다", HttpStatus.OK);
     }
-    //회원목록관리
+    //회원 목록 관리
     @GetMapping("/userList")
     public String usersAdmin(Pager pager , Model model, @AuthenticationPrincipal CustomUser customUser){
         //시큐리티 세션값

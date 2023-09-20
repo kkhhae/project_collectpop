@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head th:replace="layout/header :: header"></head>
+<script src="https://unpkg.com/@yaireo/tagify"></script>
+<link href="https://unpkg.com/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.10/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.10/dist/sweetalert2.min.js"></script>
+<link th:href="@{/assets/css/style-feed.css}" rel="stylesheet" type="text/css">
+<body data-spy="scroll" data-target=".onpage-navigation" data-offset="60">
+<!--페이지 로딩용 -->
+<div class="page-loader">
+    <div class="loader">Loading...</div>
+</div>
+
+<!--로그인 전 Start Session Null-->
+<div sec:authorize="isAnonymous()" >
+    <!--헤더 밑 컨텐츠 시작 부분 (사실상 헤더) startContent  -->
+    <nav class="navbar navbar-custom navbar-fixed-top" role="navigation" >
+        <div class="container">
+
+            <!--좌측 로고 -->
+            <div class="navbar-header" >
+                <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#custom-collapse"><span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span>
+                    <span class="icon-bar"></span></button><a class="navbar-brand" href="/collectpop/" >COLLECTPOPS</a>
+            </div>
+
+            <!-- 우측 헤더 목록-->
+            <div class="collapse navbar-collapse" id="custom-collapse" >
+                <ul class="nav navbar-nav navbar-right" style="display:inline-block;">
+                    <!--                        <li class=""><a class="" href="#" >NOW</a> </li>-->
+                    <li class=""><a class="" th:href="@{/collectpop/store/storeList}" >팝업스토어</a></li>
+                    <li class=""><a class="" th:href="@{/collectpop/map}" >지도</a></li>
+                    <li class=""><a class="" th:href="@{/collectpop/feed}" >피드</a></li>
+                    <li class=""><a class="" th:href="@{/collectpop/users/login}">로그인</a></li>
+
+                    <!--
+                     <li class="dropdown"><a class="dropdown-toggle" href="#" data-toggle="dropdown">dropdownx</a></li>
+                        <ul class="dropdown-menu">
+                            <li><a href="">Default</a></li>
+                            <li><a href="">One Page</a></li>
+                            <li><a href="">Agency</a></li>
+                        </ul>
+                    -->
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+</div>
+<!--End Session Null-->
+
+
+<!--로그인 후 Start Session NotNull -->
+<div sec:authorize="isAuthenticated()">
+
+    <!--헤더 밑 컨텐츠 시작 부분 (사실상 헤더) startContent  -->
+    <nav class="navbar navbar-custom navbar-fixed-top" role="navigation" >
+        <div class="container">
+
+            <!--좌측 로고 -->
+            <div class="navbar-header" >
+                <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#custom-collapse"><span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span>
+                    <span class="icon-bar"></span></button><a class="navbar-brand" href="/collectpop/" >COLLECTPOPS</a>
+            </div>
+
+            <!-- 우측 헤더 목록-->
+            <div class="collapse navbar-collapse" id="custom-collapse" >
+                <ul class="nav navbar-nav navbar-right" style="display:inline-block;">
+                    <li class=""><a class="" th:href="@{/collectpop/store/storeList}" >팝업스토어</a></li>
+                    <li class=""><a class="" th:href="@{/collectpop/map}" >지도</a></li>
+                    <li class=""><a class="" th:href="@{/collectpop/feed}" >피드</a></li>
+                    <li class=""><a class=""  th:href="@{/collectpop/users/mypage/{id}(id=${users.userId})}" >마이페이지</a></li>
+                    <li class=""><a class="" th:href="@{/logout}">로그아웃</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!--End Session Not Null-->
+
+</div>
+<!-- start feed main -->
+    <section id="feedwrap" class="container" style="margin-top: 60px;">
+        <div id="feedhead" class="container">
+            <div id="feedheadcontent" class="form-group">
+                <input id="sinput" class="form-control input-lg" type="text" placeholder="피드 검색" style="margin-top: 7px;">
+                <button sec:authorize="isAuthenticated()" id="picon" type="button"><i class="bi bi-plus-circle"></i></button>
+                <button sec:authorize="isAnonymous()" id="picon" class="hidden" type="button"><i class="bi bi-plus-circle"></i></button>
+            </div>
+        </div>
+        <hr style="margin: 0;">
+
+        <div id="feedcontent">
+            <!-- feed content... -->
+        </div>
+    </section>
+    <!-- add feed moal -->
+    <div id="addModalWrap" class="modal unstaged">
+        <div id="modalContent">
+            <div id="modalHeader">
+                <p id="mtitle">새 피드 만들기</p>
+                <span id="closeBtn">&times;</span>
+            </div>
+            <form action="/collectpop/addfeed" method="post" enctype="multipart/form-data">
+                <div id="modalBody">
+                    <div id="imgbox">
+                        <div class="upload-box">
+                            <div id="drop-file" class="drag-file">
+                                <img src="https://img.icons8.com/pastel-glyph/2x/image-file.png" alt="파일 아이콘" class="image">
+                                <p class="message">사진을 여기에다 끌어다 놓으세요</p>
+                                <img src="" alt="미리보기 이미지" class="preview" style="object-fit: cover">
+                                <label class="file-label1" for="chooseFile">컴퓨터에서 선택</label>
+                                <input class="file" id="chooseFile" type="file" onchange="dropFile.chooseInput(this.files)" accept="image/png, image/jpeg, image/gif" multiple>
+                                <button type="button" id="fileList"><i class="bi bi-images"></i></button>
+                                <button type="button" id="fileListClose"><i class="bi bi-image"></i></button>
+                                <div id="imgList" class="openList">
+                                    <label class="file-label2" for="chooseFile"><i class="bi bi-plus-circle"></i></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="userInfo">
+                        <img class="profileImg" th:src="@{/collectpop/userimages/__${fileName}__}" alt="사용자 프로필 사진">
+                        <span id="userNickName" th:text="${nickName}" th:data-userId="${userId}">닉네임</span>
+                    </div>
+                    <div id="textareaBox">
+                        <textarea id="feedText" placeholder="문구 입력"></textarea>
+                    </div>
+                    <div id="feedHashTagBox">
+                        <input id="feedHashTag" type="hidden" name="tagName" placeholder="해쉬 태그 입력">
+                    </div>
+                    <div id="submitBtnBox">
+                        <button class="btn btn-b btn-round" id="uploadSubmitBtn" type="button">만들기</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- End of add feed modal -->
+    <!-- start view feed modal -->
+    <div id="viewModalWrap" class="modal unstaged">
+        <div id="viewImg">
+            <div class="prevBtn hidden"><i class="bi bi-caret-left-fill"></i></div>
+            <div id="viewImgBox">
+
+            </div>
+            <div class="nextBtn hidden"><i class="bi bi-caret-right-fill"></i></div>
+        </div>
+        <div id="viewModalContent">
+            <div id="viewImg2">
+                <div class="prevBtn hidden"><i class="bi bi-caret-left-fill"></i></div>
+                <div id="viewImgBox2">
+
+                </div>
+                <div class="nextBtn hidden"><i class="bi bi-caret-right-fill"></i></div>
+            </div>
+            <div id="viewBody">
+                <div class="viewBodyHeader">
+                    <img class="viewprofileImg" src="/assets/popupimg/moon.jpg" alt="프로필 이미지">
+                    <h6 class="writerNickName">작성자 닉네임</h6>
+                    <button id="feedmanu" class="viewIcon" type="button" style="margin-right: 10px;"><i class="bi bi-three-dots"></i></button>
+                </div>
+                <div class="viewBodymain">
+                    <div class="writerComent">
+                        <div class="writerInfo">
+                            <img class="viewprofileImg" src="/assets/popupimg/moon.jpg" alt="프로필 이미지">
+                            <h6 id="writerNickName">작성자 닉네임 &nbsp;&nbsp;
+                                <span id="writerContent" style="font: 300 13px '';">작성자 글ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ</span>
+                                <br> - 2주
+                            </h6>
+                            <span id="viewCloseBtn">&times;</span>
+                        </div>
+                        <!-- reply area -->
+                        <div id="replyBox">
+
+                        </div>
+                        <!-- End of reply area -->
+                    </div>
+                    <div class="viewBodyfooter">
+                        <button class="viewIcon likes" type="button"><i class="bi bi-suit-heart"></i></button>
+                        <button class="viewIcon" type="button"><i class="bi bi-reply-all"></i></button>
+                        <button class="viewIcon" type="button"><i class="bi bi-share"></i></button>
+                        <p id="likes">좋아요 : <span>1234</span></p>
+                        <p id="replies">댓글 : <span>35</span></p>
+                    </div>
+                    <div class="replyInput">
+                        <label>
+                            <input id="replyContent" type="text" placeholder="댓글 입력">
+                        </label>
+                        <button id="replyBtn" type="button" class="viewIcon">게시</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End of view feed modal -->
+    <!-- feedmanu modal start -->
+    <div id="feedManuModalWrap" class="modal unstaged">
+        <div class="feedManumodalContent">
+            <div class="fmanuContent">
+                <h4>피드 메뉴<span id="feedManuCloseBtn">x</span></h4>
+            </div>
+            <div id="userCheck">
+                <div class="fmanuContent">
+                    <button id="updatefeed" class="feedDetail" value="1">게시물 수정<span class="sendIcon"><i class="bi bi-caret-right"></i></span></button>
+                </div>
+                <div class="fmanuContent">
+                    <button id="deletefeed" class="feedDetail" value="1">게시물 삭제<span class="sendIcon"><i class="bi bi-caret-right"></i></span></button>
+                </div>
+            </div>
+            <div class="fmanuContent">
+                <button class="feedDetail" id="decBtn" value="1">신고<span class="sendIcon"><i class="bi bi-caret-right"></i></span></button>
+            </div>
+        </div>
+    </div>
+    <!-- End of feedmanu modal -->
+    <div id="deleteCheck" class="modal unstaged">
+        <div class="deleteCheckContentBox">
+            <div class="deleteCheckContent">
+                <h4>정말 삭제하시겠습니까?</h4>
+            </div>
+            <div class="deleteCheckContent">
+                <p class="deleteDetail">삭제하시면 복구 하실 수 없습니다.</p>
+            </div>
+            <div class="deleteCheckContent">
+                <button id="deleteBtn" class="btn-danger">삭제</button>&nbsp;&nbsp;<button id="deletemodalclose" class="">취소</button>
+            </div>
+        </div>
+    </div>
+    <!-- Declaration modal start -->
+    <div id="decModalWrap" class="modal unstaged">
+        <div id="decModalContent" class="decModalContent">
+            <div class="decContent">
+                <h4>신고<span id="decModalCloseBtn">x</span></h4>
+            </div>
+            <div class="decContent">
+                <h5>이 글을 신고하는 이유?</h5>
+            </div>
+
+        </div>
+    </div>
+    <!-- End of Declaration modal -->
+<!-- End of feed main-->
+<script src="/assets/lib/jquery/dist/jquery.js"></script>
+<script src="/assets/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="/assets/lib/wow/dist/wow.js"></script>
+<script src="/assets/lib/jquery.mb.ytplayer/dist/jquery.mb.YTPlayer.js"></script>
+<script src="/assets/lib/isotope/dist/isotope.pkgd.js"></script>
+<script src="/assets/lib/imagesloaded/imagesloaded.pkgd.js"></script>
+<script src="/assets/lib/flexslider/jquery.flexslider.js"></script>
+<script src="/assets/lib/owl.carousel/dist/owl.carousel.min.js"></script>
+<script src="/assets/lib/smoothscroll.js"></script>
+<script src="/assets/lib/magnific-popup/dist/jquery.magnific-popup.js"></script>
+<script src="/assets/lib/simple-text-rotator/jquery.simple-text-rotator.min.js"></script>
+<script src="/assets/js/feed.js"></script>
+<script src="/assets/js/plugins.js"></script>
+<script src="/assets/js/main.js"></script>
+</body>
+</html>

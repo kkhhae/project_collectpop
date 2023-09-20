@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.collectpop.repository.PopupStoreMapper">
+
+    <!-- 팝업 스토어 등록 -->
+    <insert id="insertStore" parameterType="com.collectpop.domain.PopupStoreVO" >
+        <selectKey keyProperty="psId" resultType="java.lang.Long" order="BEFORE">
+            SELECT popupstore_seq.NEXTVAL FROM dual
+        </selectKey>
+        INSERT INTO popupstore (userId, psId, name, thumbnail, content, startDate, endDate, latitude, longitude, address, storeReg, fee)
+        VALUES (#{userId}, #{psId}, #{name}, #{thumbnail}, #{content},
+        <if test="startDate != null">#{startDate},</if><if test="startDate == null">NULL,</if>
+        <if test="endDate != null">#{endDate},</if><if test="endDate == null">NULL,</if>
+        #{latitude}, #{longitude}, #{address}, sysdate,
+        <choose>
+            <when test="fee != null">#{fee}</when>
+            <otherwise>0</otherwise>
+        </choose>
+        )
+    </insert>
+
+    <!-- 팝업 스토어 해시태그 등록 -->
+    <insert id="insertHashtag" parameterType="com.collectpop.domain.PopupStoreHashtagVO">
+        INSERT INTO popupstorehashtags (hashId, psId, hashtag)
+        VALUES (popupstorehashtags_seq.nextval, #{psId}, #{hashtag})
+    </insert>
+
+    <!-- 추가 이미지 정보 저장 -->
+    <insert id="insertPhoto" parameterType="com.collectpop.domain.StorePhotosVO">
+        INSERT INTO storephotos (photoId, psId, photoPath)
+        VALUES (storephotos_seq.nextval, #{psId}, #{photoPath})
+    </insert>
+
+    <!-- 스토어 정보 업데이트 -->
+    <update id="updateStore" parameterType="com.collectpop.domain.PopupStoreVO">
+        UPDATE popupstore
+        SET
+        name = #{name},
+        <if test="thumbnail != null">
+            thumbnail = #{thumbnail},
+        </if>
+        content = #{content},
+        startDate =
+        <choose>
+            <when test="startDate != null">#{startDate}</when>
+            <otherwise>NULL</otherwise>
+        </choose>,
+        endDate =
+        <choose>
+            <when test="endDate != null">#{endDate}</when>
+            <otherwise>NULL</otherwise>
+        </choose>,
+        latitude = #{latitude},
+        longitude = #{longitude},
+        address = #{address},
+        fee =
+        <choose>
+            <when test="fee != null">#{fee}</when>
+            <otherwise>0</otherwise>
+        </choose>
+        WHERE psId = #{psId}
+    </update>
+
+    <!-- 수정 전 기존 해시태그 목록 지우기 -->
+    <delete id="deleteHashtags" parameterType="java.lang.Long">
+        DELETE FROM popupstorehashtags
+        WHERE psId = #{psId}
+    </delete>
+
+    <!-- 팝업 고유번호로 기존대표사진파일명 가져오기 -->
+    <select id="getPreviousThumbnailPathByPsId" resultType="String">
+        SELECT thumbnail
+        FROM popupstore
+        WHERE psId = #{psId}
+    </select>
+
+    <!-- 등업 신청 내용 저장 -->
+    <insert id="insertRequest" parameterType="com.collectpop.domain.StoreRequestVO">
+        INSERT INTO storerequest (requestid, companyname, bossname, content, businessregistrationnumber, contactnumber,
+        document1, document2, document3, userId)
+        VALUES (storerequest_seq.nextval, #{companyname}, #{bossname}, #{content}, #{businessregistrationnumber}, #{contactnumber},
+        #{document1, jdbcType=VARCHAR}, #{document2, jdbcType=VARCHAR}, #{document3, jdbcType=VARCHAR}, #{userId})
+    </insert>
+
+    <!-- 유저 고유번호로 유저 이메일값 받아오기 -->
+    <select id="getUserEmailById" resultType="string">
+        SELECT email FROM users WHERE userId = #{userId}
+    </select>
+
+    <!-- 팝업 스토어 고유번호로 해시태그 가져오기 -->
+    <select id="getHashtagsByPsId" parameterType="java.lang.Long" resultType="java.lang.String">
+        SELECT hashtag
+        FROM popupstorehashtags
+        WHERE psid = #{psId}
+    </select>
+
+    <!-- 팝업 스토어 고유번호에 맞는 스토어 정보 가져오기 -->
+    <select id="getStoreById" parameterType="java.lang.Long" resultType="com.collectpop.domain.PopupStoreVO">
+        SELECT *
+        FROM popupstore
+        WHERE psId = #{psId}
+    </select>
+
+    <!-- 팝업 고유번호로 추가 이미지 가져오기 -->
+    <select id="getAdditionalPhotosByPsId" resultType="com.collectpop.domain.StorePhotosVO">
+        SELECT photoId, psId, photoPath
+        FROM storephotos
+        WHERE psId = #{psId}
+    </select>
+
+    <!-- 등업신청 전체리스트 가져오기 -->
+    <select id="getAllStoreRequests" resultType="com.collectpop.domain.StoreRequestVO">
+        SELECT * FROM storerequest
+    </select>
+
+    <select id="getAllStoreRequestsSortedByNewest" resultType="com.collectpop.domain.StoreRequestVO">
+        SELECT * FROM storerequest
+        ORDER BY requestReg DESC
+    </select>
+
+    <select id="getAllStoreRequestsSortedByOldest" resultType="com.collectpop.domain.StoreRequestVO">
+        SELECT * FROM storerequest
+        ORDER BY requestReg ASC
+    </select>
+
+
+
+
+
+
+    <!-- 등업고유번호로 해당 신청정보 가져오기 -->
+    <select id="getRequestById" resultType="com.collectpop.domain.StoreRequestVO">
+        SELECT * FROM storerequest WHERE requestId = #{requestId}
+    </select>
+
+    <!-- 조회수 증가 -->
+    <update id="increaseViews" parameterType="long">
+        UPDATE popupstore
+        SET views = views + 1
+        WHERE psId = #{psId}
+    </update>
+
+
+
+
+
+
+
+    <!-- 좋아요 +1 -->
+    <update id="plusStoreLike" parameterType="Long">
+        UPDATE popupstore
+        SET storelike = storelike + 1
+        WHERE psId = #{psId}
+    </update>
+    <!-- 좋아요 -1 -->
+    <update id="minusStoreLike" parameterType="Long">
+        UPDATE popupstore
+        SET storelike = storelike - 1
+        WHERE psId = #{psId}
+    </update>
+    <!-- 업데이트된 좋아요 가져오기 -->
+    <select id="getUpdatedLikeCount" resultType="int" parameterType="Long">
+        SELECT storelike
+        FROM popupstore
+        WHERE psId = #{psId}
+    </select>
+
+    <!-- 팝업 좋아요 여부 확인용 -->
+    <select id="isStoreLiked" parameterType="com.collectpop.domain.WholikeVO" resultType="int">
+        SELECT COUNT(*)
+        FROM wholike
+        WHERE psId = #{psId} AND userId = #{userId} AND likeStatus = 1
+    </select>
+
+    <!-- 팝업스토어 좋아요 정보 추가 -->
+    <insert id="insertLikeInfo" parameterType="com.collectpop.domain.WholikeVO">
+        INSERT INTO wholike (likeId, psId, userId, likeStatus)
+        VALUES (wholike_seq.nextval, #{psId}, #{userId}, #{likeStatus})
+    </insert>
+    <!-- 팝업스토어 좋아요 정보 삭제 -->
+    <delete id="deleteLikeInfo" parameterType="map">
+        DELETE FROM wholike
+        WHERE psId = #{psId} AND userId = #{userId}
+    </delete>
+
+
+
+
+
+
+
+    <!-- 팝업 스토어 전체리스트 가져오기 -->
+    <select id="getAllPopupStores" resultType="com.collectpop.domain.PopupStoreVO">
+        SELECT * FROM popupstore
+    </select>
+
+    <!-- 현재 오픈 중인 스토어 조회 쿼리 -->
+    <select id="getCurrentPopupStores" resultType="com.collectpop.domain.PopupStoreVO">
+        <![CDATA[
+        SELECT * FROM popupstore
+        WHERE (startDate IS NOT NULL AND startDate <= SYSDATE AND (endDate IS NULL OR endDate >= SYSDATE))
+        ]]>
+    </select>
+
+    <!-- 오픈 예정인 스토어 조회 쿼리 -->
+    <select id="getUpcomingPopupStores" resultType="com.collectpop.domain.PopupStoreVO">
+        <![CDATA[
+        SELECT * FROM popupstore
+        WHERE (startDate IS NULL OR startDate > SYSDATE)
+        ]]>
+    </select>
+
+    <!-- 지난 스토어 조회 쿼리 -->
+    <select id="getPastPopupStores" resultType="com.collectpop.domain.PopupStoreVO">
+        <![CDATA[
+        SELECT * FROM popupstore
+        WHERE (endDate IS NOT NULL AND endDate < SYSDATE)
+        ]]>
+    </select>
+
+    <!-- 최신 등록순 -->
+    <select id="getStoresSortedByNewest" resultType="com.collectpop.domain.PopupStoreVO">
+        SELECT *
+        FROM popupstore
+        ORDER BY storeReg DESC
+    </select>
+
+    <!-- 오래된 순 -->
+    <select id="getStoresSortedByOldest" resultType="com.collectpop.domain.PopupStoreVO">
+        SELECT *
+        FROM popupstore
+        ORDER BY storeReg ASC
+    </select>
+
+    <!-- 좋아요 순 -->
+    <select id="getStoresSortedByLikes" resultType="com.collectpop.domain.PopupStoreVO">
+        SELECT *
+        FROM popupstore
+        ORDER BY storelike DESC
+    </select>
+
+    <!-- 조회수 순 -->
+    <select id="getStoresSortedByViews" resultType="com.collectpop.domain.PopupStoreVO">
+        SELECT *
+        FROM popupstore
+        ORDER BY views DESC
+    </select>
+
+
+    <!-- 전체 검색 -->
+    <select id="searchStores" parameterType="String" resultType="com.collectpop.domain.PopupStoreVO">
+        SELECT *
+        FROM popupstore
+        WHERE name LIKE '%' || #{query} || '%' OR
+        address LIKE '%' || #{query} || '%' OR
+        psId IN (
+        SELECT psId
+        FROM popupstorehashtags
+        WHERE hashtag LIKE '%' || #{query} || '%'
+        )
+    </select>
+    <!-- 제목 검색 -->
+    <select id="searchStoresByTitle" parameterType="String" resultType="com.collectpop.domain.PopupStoreVO">
+        SELECT *
+        FROM popupstore
+        WHERE name LIKE '%' || #{query} || '%'
+    </select>
+    <!-- 주소 검색 -->
+    <select id="searchStoresByAddress" parameterType="String" resultType="com.collectpop.domain.PopupStoreVO">
+        SELECT *
+        FROM popupstore
+        WHERE address LIKE '%' || #{query} || '%'
+    </select>
+    <!-- 해시태그 검색 -->
+    <select id="searchStoresByHashtag" parameterType="String" resultType="com.collectpop.domain.PopupStoreVO">
+        SELECT *
+        FROM popupstore
+        WHERE psId IN (
+        SELECT psId
+        FROM popupstorehashtags
+        WHERE hashtag LIKE '%' || #{query} || '%'
+        )
+    </select>
+
+
+
+
+
+    <!-- 주소 검색 -->
+    <select id="getMap" resultType="com.collectpop.domain.PopupStoreVO">
+        SELECT * FROM popupstore
+    </select>
+    <!-- 해시태그 검색 -->
+    <select id="getHash" resultType="com.collectpop.domain.PopupStoreHashtagVO">
+        SELECT * FROM popupstorehashtags
+    </select>
+
+
+    <!-- 실시간 댓글 저장 -->
+    <insert id="insertRealTimeComment" parameterType="com.collectpop.domain.RealTimeCommentVO">
+        <selectKey keyProperty="commentId" resultType="java.lang.Long" order="BEFORE">
+            SELECT realtimecomment_seq.NEXTVAL FROM dual
+        </selectKey>
+        INSERT INTO realtimecomment  (commentId, psId, userId, nickname, content, commentReg)
+        VALUES (#{commentId}, #{psId}, #{userId}, #{nickname}, #{content}, SYSDATE)
+    </insert>
+
+
+    <!-- 팝업 고유번호로 기존 댓글 가져오기 15개 -->
+    <select id="selectRealTimeCommentByPsId" parameterType="java.lang.Long" resultType="com.collectpop.domain.RealTimeCommentVO">
+        <![CDATA[
+        SELECT * FROM (
+        SELECT * FROM realtimecomment
+        WHERE psId = #{psId}
+        ORDER BY commentReg DESC
+        ) WHERE ROWNUM <= 15
+         ]]>
+    </select>
+
+
+    <delete id="deleteByPhotopath" parameterType="string">
+        DELETE FROM storephotos
+        WHERE photopath = #{cleanedPhotoPath}
+    </delete>
+
+    <select id="getPopupStoreByUesrId" resultType="com.collectpop.domain.PopupStoreVO">
+        SELECT * FROM popupstore WHERE userId =#{userId}
+    </select>
+
+
+
+</mapper>

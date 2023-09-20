@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en-US" dir="ltr" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+
+<th:block th:fragment="footer">
+
+
+<footer>
+
+    <!-- Start Footer-->
+
+    <div class="module-small bg-dark" style="padding: 0px 15px;  justify-content: space-between;">
+        <div class="container">
+            <!--로고 들어갈 공간 ,테스트용 이미지 첨가-->
+            <div class="row" style="float:left">
+                <label>
+                    <input type="image" src="/assets/images/favicons/apple-icon.png"
+                           style="width:150px;
+                            height:150px;
+                            overflow:hidden;
+                            margin:0 auto;
+                        }"
+                           alt=""/>
+                </label>
+
+                <label style="padding: 30px " >
+                    <h2 class="widget-title font-alt">COLLECTPOP</h2>
+                    주식회사 더조은  |  주소 : 서울시 김구 홍길동 11번가<br>
+                    대표 : 홍길동하  |  사업자등록번호 : 123 -12- 12345 <br>
+                    <a href="/collectpop/" class="">이용약관</a> <br>
+                    <a href="/collectpop/" class="">개인정보처리방침</a>
+                </label>
+            </div>
+            <div class="row" style="text-align:right; float:right;">
+                <label style="padding: 30px " >
+                    <h5 class="widget-title font-alt">운영문의</h5>
+                    OFFICE : 12-123-1234 <br>
+                    운영시간 <br>
+                    평일 09:30-18:30 | 주말·공휴일 제외<br>
+                    점심시간 <br>
+                    평일 11:40-13:00
+                </label>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!--밑에 copyright 부분 -->
+    <hr class="divider-d">
+    <footer class="footer bg-dark">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-6">
+                    <p class="copyright font-alt">&copy; 2023&nbsp;<a href="/collectpop/">COLLECTPOPS</a>, All Rights Reserved</p>
+                </div>
+                <!-- 오른쪽 하단에 sns계정 연결버튼(페북 트위터 등)
+                <div class="col-sm-6">
+                    <div class="footer-social-links"><a href="#"><i class="fa fa-facebook"></i></a><a href="#"><i class="fa fa-twitter"></i></a><a href="#"><i class="fa fa-dribbble"></i></a><a href="#"><i class="fa fa-skype"></i></a>
+                    </div>
+                </div>
+                -->
+            </div>
+        </div>
+    </footer>
+    </div>
+    <div class="scroll-up"><a href="#totop"><Fi class="fa fa-angle-double-up"></Fi></a></div>
+
+    </main>
+    <!--
+    JavaScripts
+    =============================================
+    -->
+    <script th:src="@{/assets/lib/jquery/dist/jquery.js}"></script>
+    <script th:src="@{/assets/lib/bootstrap/dist/js/bootstrap.min.js}"></script>
+    <script th:src="@{/assets/lib/wow/dist/wow.js}"></script>
+    <script th:src="@{/assets/lib/jquery.mb.ytplayer/dist/jquery.mb.YTPlayer.js}"></script>
+    <script th:src="@{/assets/lib/isotope/dist/isotope.pkgd.js}"></script>
+    <script th:src="@{/assets/lib/imagesloaded/imagesloaded.pkgd.js}"></script>
+    <script th:src="@{/assets/lib/flexslider/jquery.flexslider.js}"></script>
+    <script th:src="@{/assets/lib/owl.carousel/dist/owl.carousel.min.js}"></script>
+    <script th:src="@{/assets/lib/smoothscroll.js}"></script>
+    <script th:src="@{/assets/lib/magnific-popup/dist/jquery.magnific-popup.js}"></script>
+    <script th:src="@{/assets/lib/simple-text-rotator/jquery.simple-text-rotator.min.js}"></script>
+    <script th:src="@{/assets/js/plugins.js}"></script>
+    <script th:src="@{/assets/js/main.js}"></script>
+
+</footer>
+
+</th:block>

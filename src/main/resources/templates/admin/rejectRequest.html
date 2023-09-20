@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en-US" dir="ltr" xmlns:th="http://www.thymeleaf.org">
+
+<!--Header 설정 -->
+<head th:replace="layout/header :: header"></head>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<style>
+    p {
+text-align: center;
+}
+
+        textarea {
+        width: 100%;
+        height: 250px;
+        border: none;
+        resize: none;
+        border: 1px solid black;
+      }
+</style>
+<!--body-->
+<body data-spy="scroll" data-target=".onpage-navigation" data-offset="60">
+<!-- body쪽 header처럼 되어 있는 내용들 -->
+<th:block th:replace="layout/startContent :: startContent"></th:block>
+
+<!-- Main Content들어갈 부분 -->
+
+<section class="module bg-dark-30 about-page-header" data-background="assets/images/about_bg.jpg">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-6 col-sm-offset-3">
+                <h1 class="module-title font-alt mb-0">스토어매니저 반려사유</h1>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+
+    <div th:each="storeRequest : ${storeRequests}">
+
+            <p>신청번호</p>
+            <p th:text="${storeRequest.requestId}"></p>
+        <hr class="divider-w mb-10">
+            <p>회사명</p>
+            <p th:text="${storeRequest.companyname}"></p>
+        <hr class="divider-w mb-10">
+            <p>대표자명</p>
+            <p th:text="${storeRequest.bossname}"></p>
+        <hr class="divider-w mb-10">
+            <p>사업자등록번호</p>
+            <p th:text="${storeRequest.businessregistrationnumber}"></p>
+        <hr class="divider-w mb-10">
+            <p>신청내용</p>
+            <p th:text="${storeRequest.content}"></p>
+        <hr class="divider-w mb-10">
+            <p>신청자 연락처</p>
+            <p th:text="${storeRequest.contactnumber}"></p>
+        <hr class="divider-w mb-10">
+            <p>신청시간</p>
+            <p th:text="${storeRequest.requestReg}"></p>
+        <hr class="divider-w mb-10">
+    </div>
+</div>
+<div class="container">
+    <form class="form" action="" th:action th:object="${reject}" method="post">
+        <input type="hidden" th:value="${rejectId}">
+        <h2>반려사유</h2>
+
+        <textarea id="content" th:field="*{content}" cols="30" rows="10" style="width: 60"></textarea>
+        <button type="submit" class="btn btn-block btn-round btn-b" >승인</button>
+    </form>
+    <br>
+</div>
+
+
+
+<!-- 1.정렬 유형만 선택시 정렬-->
+<script>
+</script>
+
+
+
+<!-- End Main Content -->
+
+<!-- Footer 붙히기 -->
+<th:block th:replace="layout/footer :: footer"></th:block>
+</body>
+</html>

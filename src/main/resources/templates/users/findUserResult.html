@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en-US" dir="ltr" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<!--Header 설정 -->
+<head th:replace="layout/header :: header"></head>
+
+<!--body-->
+<body data-spy="scroll" data-target=".onpage-navigation" data-offset="60">
+<!-- body쪽 header처럼 되어 있는 내용들 -->
+<th:block th:replace="layout/startContent :: startContent"></th:block>
+
+<!-- Main Content들어갈 부분 -->
+<div class="main">
+    <section class="module">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-5 col-sm-offset-1 mb-sm-40" style="width:80%;">
+                    <h4 class="font-alt">아이디찾기 결과</h4>
+                    <hr class="divider-w mb-10">
+                    <div class="form-group">결과 :
+                        <input class="form-control" type="text" th:value="${users.username}" readonly/>
+                    </div>
+                    <div class="form-group"><a th:href="@{/collectpop/users/findPassword}">비밀번호 찾기</a></div>
+                    <div class="form-group"><a th:href="@{/collectpop/users/join}">회원가입</a></div>
+                    <div class="form-group"><a th:href="@{/collectpop/}">홈으로</a></div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Footer 붙히기 -->
+<th:block th:replace="layout/footer :: footer"></th:block>
+</body>

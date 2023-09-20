@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en-US" dir="ltr"xmlns:th="http://www.thymeleaf.org">
+
+<!--Header 설정 -->
+<head th:replace="layout/header :: header"></head>
+<style>
+    .links-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .right-links {
+        display: flex;
+        gap: 10px; /* 각 링크 사이의 간격 설정 */
+    }
+    .container {
+        justify-content: center;
+        align-items: center;
+    }
+    .form-group {
+        justify-content: center;
+        align-items: center;
+    }
+</style>
+
+<!--body-->
+<body data-spy="scroll" data-target=".onpage-navigation" data-offset="60">
+<!-- body쪽 header처럼 되어 있는 내용들 -->
+<th:block th:replace="layout/startContent :: startContent"></th:block>
+
+<!-- Main Content들어갈 부분 -->
+<br>
+<br>
+<br>
+<br>
+
+<div id="module">
+    <div id="container" style="display:flex; justify-content: center; text-align:center;">
+        <div class="row" >
+            <form action="" th:action="@{/collectpop/users/edit/{userId}(userId=${users.userId})}" th:object="${users}" method="post"
+             enctype="multipart/form-data" style="margin: 0 auto;">
+
+                <div class="col-sm-5 col-sm-offset-1 mb-sm-40" style="width:80%;">
+                    <h4 class="font-alt" >회원정보수정</h4>
+                    <hr class="divider-w mb-10">
+                </div>
+
+
+                <div class="container-center">
+                    <!-- 기본 이미지를 표시하는 img 태그 -->
+                    <img id="imagePreview" th:src="@{collectpop/users/__${users.img}__}" alt="Image Preview"
+                         style="width: 200px; height: 200px;">
+
+                    <!-- 파일을 업로드하는 input 태그 -->
+                    <input type="file" id="img" name="profileImg"
+                           onchange="updateImagePreview(this);">
+                </div>
+
+
+                <div class="form-group">
+                    UserId no. : <input type="text" th:field="*{userId}" readonly class="form-control"  /> <br />
+                </div>
+                <div class="form-group">
+                    Email : <input type="text" th:field="*{email}" readonly class="form-control" /> <br />
+                </div>
+                <div class="form-group">
+                    ID 변경 : <input type="text" th:field="*{username}" class="form-control" /> <br />
+                </div>
+                <div class="form-group">
+                    닉네임 변경 : <input type="text" th:field="*{nickname}" class="form-control" /> <br />
+                </div>
+                <div class="form-group">
+                    전화번호 변경(010-1111-1111) : <input type="text" th:field="*{phoneNum}" class="form-control" /> <br />
+                </div>
+                <div class="form-group">
+                    Password : <input type="password" name="password" th:field="*{password}" class="form-control" /> <br />
+                </div>
+                <input type="submit" value="수정 " th:onclick="return fieldCheck()">
+                <input type="button" value="취소" th:onclick="|location.href='@{/collectpop/users/mypage/{id}(id=${users.userId})}'|">
+            </form>
+            <br>
+            <br>
+            <br>
+        </div>
+    </div>
+</div>
+
+<!-- End Main Content -->
+
+<!-- Footer 붙히기 -->
+<th:block th:replace="layout/footer :: footer"></th:block>
+
+</body>
+
+<script >
+
+    //유효성 검사하기
+    function fieldCheck() {
+        let form = document.getElementById("form");
+
+        if(!form.password.value) {
+            alert("비밀번호를 입력하세요");
+            return false;
+        }
+
+        return true;
+    }
+
+
+
+
+    //이미지 업로드 시 미리보기
+     function updateImagePreview(input) {
+         if (input.files && input.files[0]) {
+             var reader = new FileReader();
+
+             reader.onload = function(e) {
+                 document.getElementById('imagePreview').src = e.target.result;
+             }
+
+             reader.readAsDataURL(input.files[0]); // convert to base64 string
+         }
+     }
+
+</script>
+</html>

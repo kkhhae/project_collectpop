@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="layout/header :: header"></head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<!-- Swiper CSS -->
+<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
+
+<!-- Swiper JS -->
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+<link th:href="@{/assets/css/style-admin-main.css}" rel="stylesheet" type="text/css">
+<style>
+    /* 폼 스타일링 */
+    .image-upload-form {
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    /* 파일 입력(input) 스타일링 */
+    input[type="file"] {
+        display: none;
+    }
+
+    label {
+        display: inline-block;
+        background-color: #3498db;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    /* 이미지 미리보기 스타일링 */
+    #image-preview {
+        margin-top: 20px;
+        max-width: 100%;
+        height: auto;
+    }
+    .swiper-container {
+        width: 1330px; /* 원하는 너비로 조정 */
+        height: 500px; /* 원하는 높이로 조정 */
+        overflow: hidden;
+        position: relative; /* 추가: 상대 위치 지정 */
+        margin: 0 auto; /* 가운데 정렬을 위해 사용 */
+    }
+
+    /* Swiper 슬라이드 이미지 크기 통일 및 꽉 차게 설정 */
+    .swiper-slide img {
+        width: 100%; /* 이미지를 부모 요소에 맞게 100%로 설정 */
+        height: 90%; /* 이미지를 부모 요소에 맞게 90%로 설정 */
+    }
+
+    /* Swiper 페이지네이션 컨테이너 스타일 */
+    .swiper-pagination-container {
+        text-align: center; /* 가운데 정렬을 위해 텍스트 정렬 설정 */
+        position: absolute; /* 추가: 절대 위치로 설정 */
+        bottom: 0; /* 하단에 위치하도록 설정 */
+        width: 100%; /* 가로 폭 100% 설정 */
+    }
+
+    /* Swiper 페이지네이션 스타일 */
+    .swiper-pagination {
+        display: inline-block; /* 페이지네이션을 인라인 블록 요소로 표시 */
+    }
+
+    .banner-deleteBtn{
+        display: flex;
+        border: none;
+        color: white;
+        background-color: #777;
+        border-radius: 5px;
+        padding: 8px 37px;
+    }
+</style>
+<body data-spy="scroll" data-target=".onpage-navigation" data-offset="60">
+<nav class="navbar navbar-custom navbar-fixed-top clearfix" role="navigation">
+    <div class="container">
+
+        <!--좌측 로고 -->
+        <div class="navbar-header">
+            <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#custom-collapse"><span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span>
+                <span class="icon-bar"></span></button><a class="navbar-brand" th:href="@{/collectpop/admin/mainm}">COLLECTPOPS<span class="logomin">admin</span></a>
+        </div>
+
+        <!-- 우측 헤더 목록-->
+        <div class="collapse navbar-collapse" id="custom-collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li class=""><a class="" th:href="@{/collectpop}" >HOME</a> </li>
+                <li class=""><a class="" href="#" >POPUPSTORE</a></li>
+                <li class=""><a class="" href="#" >USERS</a></li>
+                <li class=""><a class="" th:href="@{/collectpop/admin/declaration}" >DECLARATION</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<br /><br />
+<div class="main">
+    <div class="main">
+        <section class="module">
+            <h1 style="text-align: center; font-weight: 900; line-height: 120%; margin-bottom: 20px;" >배너 추가하기</h1>
+            <div class="container px-4 py-5" style="width: 70%; ">
+                <div class="swiper-container-parent">
+                    <div class="swiper-container">
+                        <div class="swiper-wrapper" id="image-preview-container">
+                            <!-- 이미지 미리보기 슬라이드들이 여기에 추가될 것입니다. -->
+                        </div>
+                        <div class="swiper-pagination"></div>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="image-upload-form" style="background-color: #FFFFFF; border: none; display: flex; flex-direction: row-reverse;">
+                <form th:action="@{/collectpop/admin/banner/upload}" th:object="${banner}" method="post" enctype="multipart/form-data">
+                    <label for="image" style="background-color: #999; color: #fff; padding: 0px 20px; border-radius: 5px; ">이미지 업로드</label>
+                    <input type="file" name="files" id="image" accept="image/*" multiple required>
+                    <br/><br />
+                    <!-- 이미지 업로드 버튼 -->
+                    <input type="submit" value="수정 완료" style="border: none; border-radius: 4px; background-color: #999; padding: 0px 20px;color: white;">
+                </form>
+            </div>
+            <script th:inline="javascript">
+                let swiperContainer; // 스와이퍼 컨테이너 변수 선언
+                $(document).ready(function () {
+                    $('#image').on('change', function () {
+                        var imagePreviewContainer = $('#image-preview-container');
+                        var files = $(this)[0].files; // 선택한 파일 목록을 가져옵니다.
+
+                        // 모든 선택한 파일에 대해 프리뷰를 생성하고 추가합니다.
+                        for (var i = 0; i < files.length; i++) {
+                            var file = files[i];
+                            // 이미지 파일인 경우에만 처리합니다.
+                            if (file.type.match('image.*')) {
+                                var reader = new FileReader();
+
+                                reader.onload = function (e) {
+                                    // 업로드한 이미지의 URL을 프리뷰로 추가합니다.
+                                    var imageUrl = e.target.result;
+                                    var imageAlt = '이미지 ' + (imagePreviewContainer.find('.swiper-slide').length + 1);
+
+                                    // 스와이퍼 슬라이드를 생성하고 추가
+                                    const swiperSlide = '<div class="swiper-slide">' +
+                                        '<img src="' + imageUrl + '" alt="' + imageAlt + '">' +
+                                        '</div>';
+
+                                    imagePreviewContainer.append(swiperSlide);
+
+                                    // 스와이퍼 컨테이너 업데이트
+                                    var swiperContainer = new Swiper('.swiper-container', {
+                                        pagination: {
+                                            el: '.swiper-pagination',
+                                            clickable: true,
+                                            type: 'fraction'
+                                        }
+                                    });
+
+                                    swiperContainer.update();
+                                    swiperContainer.slideTo(swiperContainer.slides.length - 1); // 마지막 슬라이드로 이동
+                                };
+
+                                // 파일을 읽어옵니다.
+                                reader.readAsDataURL(file);
+                            }
+                        }
+                    });
+
+
+                    $('#image-upload-form').submit(function(event) {
+                        event.preventDefault();
+
+                        var formData = new FormData(this);
+
+                        $.ajax({
+                            type: 'POST',
+                            url: '/collectpop/admin/banner/upload',
+                            data: formData,
+                            cache: false,
+                            contentType: false,
+                            processData: false,
+                            success: function(response) {
+                                // 업로드 성공 시 처리
+                                console.log('파일 업로드 성공:', response);
+                                var imageUrl = '/collectpop/admin/banner/banner/' + response.file_name; // 업로드한 이미지 URL
+                                var imageAlt = '이미지 ' + (response.index + 1); // 이미지 설명 (예: '이미지 1', '이미지 2', ...)
+
+                                // 새로운 스와이퍼 슬라이드를 생성하고 추가
+                                var swiperSlide = '<div class="swiper-slide">' +
+                                    '<img src="' + imageUrl + '" alt="' + imageAlt + '">' +
+                                    '</div>';
+
+                                // 스와이퍼 컨테이너에 새로운 슬라이드 추가
+                                var swiperContainer = new Swiper('.swiper-container', {
+                                    pagination: {
+                                        el: '.swiper-pagination',
+                                        clickable: true
+                                    }
+                                });
+
+                                swiperContainer.appendSlide(swiperSlide);
+                                swiperContainer.update();
+                                swiperContainer.slideTo(swiperContainer.slides.length - 1); // 마지막 슬라이드로 이동
+
+                                // 배너 목록 업데이트
+                                updateBannerList();
+                            },
+                            error: function(error) {
+                                // 업로드 실패 시 처리
+                                console.error('파일 업로드 실패:', error);
+                                // 에러 처리 로직을 추가하세요.
+                            }
+                        });
+                    });
+                    // 페이지 로드 시 초기 배너 목록 가져오기
+                    updateBannerList();
+
+                    function updateBannerList() {
+                        $.ajax({
+                            type: 'GET',
+                            url: '/collectpop/admin/banner/list',
+                            success: function (response) {
+                                console.log('배너 목록:', response);
+
+                                // 이미지 목록을 순회하면서 슬라이드를 추가
+                                var swiperSlides = []; // 스와이퍼 슬라이드 배열
+
+                                for (var i = 0; i < response.length; i++) {
+                                    var imageUrl = '/collectpop/admin/banner/banner/' + response[i].file_name;
+                                    var imageAlt = '이미지 ' + (i + 1);
+
+                                    var swiperSlide = '<div class="swiper-slide">' +
+                                        '<img src="' + imageUrl + '" alt="' + imageAlt + '">' +
+                                        '<button class="banner-deleteBtn btn btn-primary" data-bnid="' + response[i].bnId + '">삭제</button>' +
+                                        '</div>';
+
+                                    swiperSlides.push(swiperSlide);
+                                }
+
+                                // 스와이퍼 컨테이너에 새로운 슬라이드 추가
+                                swiperContainer = new Swiper('.swiper-container', {
+                                    pagination: {
+                                        el: '.swiper-pagination',
+                                        clickable: true,
+                                        type: 'fraction'
+                                    },
+                                    on: {
+                                        slideChange: function () {
+                                            $('.swiper-pagination').html((this.realIndex + 1) + ' / ' + this.slides.length);
+                                        },
+                                    },
+                                });
+
+                                swiperContainer.appendSlide(swiperSlides);
+                                swiperContainer.update();
+                            },
+                            error: function (error) {
+                                console.error('배너 목록 가져오기 실패:', error);
+                            },
+                            complete: function () {
+
+                            }
+                        });
+                    }
+
+                    // 배너 삭제 버튼 클릭 시
+                    $(document).on("click", ".banner-deleteBtn", function () {
+                        var bnId = $(this).data('bnid'); // 삭제할 배너 ID를 가져옵니다.
+                        var swiperSlide = $(this).closest('.swiper-slide'); // 삭제할 슬라이드
+
+                        // 삭제 요청 보내기
+                        $.ajax({
+                            type: 'POST',
+                            url: '/collectpop/admin/banner/deleteBanner',
+                            data: { bnId: bnId }, // 배너 ID를 함께 전송
+                            success: function (response) {
+                                // 삭제 성공 시 처리
+                                console.log('배너 삭제 성공:', response);
+
+                                // 삭제 버튼을 클릭한 컨텍스트에서 해당 슬라이드 찾아 제거
+                                swiperSlide.remove();
+                                swiperContainer.update();
+
+                                // 첫 번째 슬라이드로 이동
+                                swiperContainer.slideTo(0);
+                            },
+                            error: function (error) {
+                                // 삭제 실패 시 처리
+                                console.error('배너 삭제 실패:', error);
+                                // 에러 처리 로직을 추가하세요.
+                            }
+                        });
+                    });
+                });
+            </script>
+
+            <hr class="divider-w mb-10" style="margin-top:20px; ">
+        </section>
+
+        <hr class="divider-w mb-10">
+
+
+        <!--프로필 쪽 끝-->
+    </div>
+
+
+
+
+<!-- end of admin main -->
+<script src="/assets/lib/jquery/dist/jquery.js"></script>
+<script src="/assets/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="/assets/lib/wow/dist/wow.js"></script>
+<script src="/assets/lib/jquery.mb.ytplayer/dist/jquery.mb.YTPlayer.js"></script>
+<script src="/assets/lib/isotope/dist/isotope.pkgd.js"></script>
+<script src="/assets/lib/imagesloaded/imagesloaded.pkgd.js"></script>
+<script src="/assets/lib/flexslider/jquery.flexslider.js"></script>
+<script src="/assets/lib/owl.carousel/dist/owl.carousel.min.js"></script>
+<script src="/assets/lib/smoothscroll.js"></script>
+<script src="/assets/lib/magnific-popup/dist/jquery.magnific-popup.js"></script>
+<script src="/assets/lib/simple-text-rotator/jquery.simple-text-rotator.min.js"></script>
+<script src="/assets/js/plugins.js"></script>
+<script src="/assets/js/main.js"></script>
+</body>
+</html>

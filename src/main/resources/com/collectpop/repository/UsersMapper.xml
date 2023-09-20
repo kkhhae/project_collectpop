@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.collectpop.repository.UsersMapper">
+
+    <!-- 회원가입 -->
+    <insert id="save" >
+        <selectKey keyProperty="userId" resultType="long" order="BEFORE">
+            select users_seq.nextval from dual
+        </selectKey>
+        insert into users(userId, email, username, nickname,password, img, address, phoneNum, regDate, repCount, role_access,role_store,role_online,role_read)
+        values(#{userId},#{email},#{username},#{nickname},#{password},#{img},#{address},#{phoneNum}, sysdate, 0, #{role_access},#{role_store},#{role_online},#{role_read})
+
+    </insert>
+
+    <!--이메일 중복체크를 위한 이메일꺼내오기 + 비밀번호 중복검사를 위한 if문 추가-->
+    <select id="check" resultType="Users">
+        select * from users where email=#{email}
+        <if test="password!=null">
+            and password=#{password}
+        </if>
+    </select>
+
+    <!--userId로 유저정보 가져오기 -->
+    <select id="findById" resultType="Users">
+        select * from users where userId=#{userId}
+    </select>
+
+    <!--user이름으로 유저찾기-->
+    <select id="findByUsername" resultType="Users">
+        select * from users where username=#{username}
+    </select>
+
+    <!--usermap에 담긴정보 가져오기-->
+    <select id="getUserMap" resultType="UserMap">
+        select * from userMap
+    </select>
+
+    <!--email로 유저찾기 -->
+    <select id="findByIdWithEmail" resultType="Users">
+        select * from users
+        where email=#{email}
+    </select>
+
+    <!--username,email로 유저 찾기-->
+    <select id="findEmailandName" resultType="Users">
+        SELECT * FROM users WHERE email=#{email} AND username like #{username}
+    </select>
+
+    <!--회원정보수정-->
+    <update id="update" >
+        update users set username=#{username}, phoneNum=#{phoneNum}, img=#{img}, nickname=#{nickname}
+        where userId=#{userId}
+    </update>
+
+    <!--유저 비활성화-->
+    <update id="updateOnline">
+        update users set role_online=#{role_online}
+        where userId=#{userId}
+    </update>
+
+
+    <!-- 비밀번호 재설정 -->
+    <update id="updatePw" >
+        update users set password=#{password}
+        where userId=#{userId}
+    </update>
+
+    <!-- 랜덤닉네임부여 -->
+    <update id="upRanNick">
+        update users set nickname=#{nickname}
+        where userId=#{userId}
+    </update>
+
+    <!-- 아이디 중복검사용 유저 찾기 -->
+    <select id="findUsername" resultType="int">
+        select count(*) from users where username=#{username}
+    </select>
+
+
+    <!--검색기능 n = 닉네임, e = 이메일, r = 신고당한횟수 -->
+    <sql id="search">
+        <trim prefix="where" prefixOverrides="or">
+            <foreach item="searchType" collection="searchTypeArr">
+                <trim prefix="or">
+                    <choose>
+                        <when test="searchType == 'n'.toString()">
+                            nickname like '%' || #{keyword} || '%'
+                        </when>
+                        <when test="searchType == 'e'.toString()">
+                            email like '%' || #{keyword} || '%'
+                        </when>
+                        <when test="searchType == 'r'.toString()">
+                            repCount like '%' || #{keyword} || '%'
+                        </when>
+                    </choose>
+                </trim>
+            </foreach>
+        </trim>
+    </sql>
+
+    <!--유저 전부 호출-->
+    <select id="getAllUsers" resultType="Users">
+        <![CDATA[
+        select r, B.* from
+            (select rownum r, A.* from
+                (select * from users   ]]>
+
+        <include refid="search"></include>
+
+        <![CDATA[
+                order by userId desc) A
+                where rownum <= (#{pageNum} * #{boardSize})
+            ) B
+        where r > (#{pageNum} - 1) * #{boardSize}
+        ]]>
+    </select>
+
+    <!--유저 총합계-->
+    <select id="getTotalUsers" resultType="long">
+        select count(*) from users
+        <include refid="search"></include>
+    </select>
+
+    <!-- 사용자,관리자 변경-->
+    <update id="changeAccess">
+        update users set role_access = #{role_access}
+        where userId=#{userId}
+    </update>
+    <!-- 회원, 스토어매니저 변경-->
+    <update id="changeStore">
+        update users set role_store = #{role_store}
+        where userId=#{userId}
+    </update>
+    <!-- 온라인, 비활성화 변경 -->
+    <update id="changeOnline">
+        update users set role_online = #{role_online}
+        where userId=#{userId}
+    </update>
+    <!--구독, 비구독 변경 -->
+    <update id="changeRead">
+        update users set role_read = #{role_read}
+        where userId=#{userId}
+    </update>
+    <!-- 내가 신청한 스토어신청 가져오기 -->
+    <select id="getMyStoreRequest" resultType="com.collectpop.domain.StoreRequestVO">
+        select * from storerequest
+        where userId = #{userId}
+    </select>
+
+    <select id="getuserImg" resultType="String">
+        select img from users where username=#{username}
+    </select>
+    <select id="getUserIdofuserImg" resultType="String">
+        select img from users where userId=#{userId}
+    </select>
+    <select id="getUserNickName" resultType="String">
+        select nickname from users where username=#{username}
+    </select>
+    <select id="getUserId" resultType="Long">
+        select userId from users where username = #{username}
+    </select>
+    <select id="getUserIdOfUserNickName" resultType="String">
+        select nickname from users where userId=#{userId}
+    </select>
+
+    <select id="getUsersByNewest" resultType="com.collectpop.domain.Users">
+        SELECT * FROM users
+        ORDER BY regDate desc
+    </select>
+
+
+    <select id="getmyReq" resultType="com.collectpop.domain.StoreRequestVO">
+        select * from storerequest
+        where userId=#{userId}
+    </select>
+
+    <select id="getReject" resultType="com.collectpop.domain.StoreReject">
+        select content from storereject
+        where userId=#{userId}
+    </select>
+
+</mapper>

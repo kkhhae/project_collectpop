@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.collectpop.repository.AdminMapper">
+    <insert id="insertEx">
+        <selectKey keyProperty="dleid" resultType="long" order="BEFORE">
+            select decExample_seq.nextval from dual
+        </selectKey>
+        insert into decExample(dleid, dleContent, regDate)
+        values(#{dleid}, #{dleContent}, sysdate)
+    </insert>
+    <select id="getAllDecEx" resultType="DecExample">
+        select * from decExample order by dleid desc
+    </select>
+    <delete id="deleteExample">
+        delete from decExample where dleid = #{dleid}
+    </delete>
+    <select id="getDeclaration" resultType="int">
+        select count(*) from declaration where fid = #{fid} and userId = #{userId}
+    </select>
+    <insert id="addDeclaration">
+        <selectKey keyProperty="did" resultType="long" order="BEFORE">
+            select dec_seq.nextval from dual
+        </selectKey>
+        insert into declaration(did, fid, userId, dleid, decnum, regDate)
+        values(#{did}, #{fid}, #{userId}, #{dleid}, 0, sysdate)
+    </insert>
+    <update id="updateDeclaration">
+        update declaration
+        set decnum = decnum + 1
+        where fid = #{fid}
+    </update>
+    <select id="getdecListWithPaging" resultType="Declaration">
+        <![CDATA[
+            select r, B.* from
+                (select rownum r, A.* from
+                    (select * from declaration
+
+                    order by did desc) A
+                where rownum <= (#{pageNum} * #{boardSize})
+                ) B
+            where r > (#{pageNum} - 1) * #{boardSize}
+        ]]>
+    </select>
+    <select id="getTotaldec" resultType="Long">
+        select count(*) from declaration
+    </select>
+    <select id="getdeclContent" resultType="String">
+        select dleContent from decExample where dleid = #{dleid}
+    </select>
+
+    <select id="getUsersByNewest" resultType="com.collectpop.domain.Users">
+        SELECT * FROM users
+        ORDER BY regDate DESC
+
+    </select>
+
+
+    <insert id="rejectRequest" >
+        <selectKey keyProperty="rejectId" resultType="long" order="BEFORE">
+            select storereject_seq.nextval from dual
+        </selectKey>
+        insert into storereject(rejectId, content, status, requestId, userId)
+        values( #{rejectId}, #{content}, #{status}, #{requestId}, #{userId})
+    </insert>
+
+    <select id="findAllReject" resultType="com.collectpop.domain.StoreReject">
+        select * from storereject
+    </select>
+
+    <select id="getRejectWithStatus" resultType="com.collectpop.domain.StoreReject">
+        select * from storereject
+        where status = 0
+    </select>
+
+    <select id="getStoreRejectByRequestId" resultType="com.collectpop.domain.StoreReject">
+        select * from storereject where requestId = #{requestId}
+    </select>
+
+    <update id="updateRequestStatus">
+        update storerequest
+        set status=#{status}
+        where requestId=#{requestId}
+    </update>
+
+</mapper>

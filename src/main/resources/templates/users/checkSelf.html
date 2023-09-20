@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en-US" dir="ltr" xmlns:th="http://www.thymeleaf.org">
+
+<!--Header 설정 -->
+<head th:replace="layout/header :: header"></head>
+
+
+<style>
+    /* div태그 css구역 */
+.links-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.right-links {
+    display: flex;
+    gap: 10px; /* 각 링크 사이의 간격 설정 */
+}
+
+
+
+
+</style>
+<!--body-->
+
+<body data-spy="scroll" data-target=".onpage-navigation" data-offset="60" style="">
+<!-- body쪽 header처럼 되어 있는 내용들 -->
+<th:block th:replace="layout/startContent :: startContent" th:readonly></th:block>
+<!-- Main Content들어갈 부분 -->
+
+<div class="main">
+    <div class="container" style="width:50%;">
+        <div class="row">
+            <div class="col-12 col-sm-5 col-sm-offset-1 mb-sm-40" style="width:80%;">
+                <div class="row">
+
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <h4 class="font-alt" style="text-align:center;">비활성화 된 계정입니다. 본인 확인 후 이용해주세요</h4>
+                    <br>
+                    <hr class="divider-w mb-10">
+                    <form class="form" action="" th:action="@{/collectpop/users/checkSelf}" th:object="${users}" method="post" onsubmit="return fieldCheck()" id="form">
+
+                        <div class="form-group last mb-4 email_input">
+                            <label for="email" id="">이메일을 입력해주세요</label>
+                            <input class="form-control" type="text" name="email" id="email">
+                        </div>
+                        <!-- <span>이메일 인증번호</span> -->
+                        <button class="btn btn-block btn-round btn-b" type="button" id="checkEmail"
+                                onclick="return emCheck()" style="width:100%;">인증번호 받기</button>
+                        <!-- 회색버튼 <button class="btn btn-outline-primary"> -->
+
+                        <div class="form-group last mb-4 check_input">
+                            <label for="memailconfirm" id="memailconfirmTxt">인증번호를 입력해주세요</label>
+                            <input type="text" class="form-control" id="memailconfirm">
+                        </div>
+
+                        <button class="btn btn-round btn-b" type="submit" id="subBtn"
+                                style="width:100%;" disabled>본인 확인 완료</button>
+                    </form>
+                    <br>
+                    <br><br>
+                    <br>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- End Main Content -->
+
+
+<!-- Footer 붙히기 -->
+<th:block th:replace="layout/footer :: footer" th:readonly></th:block>
+</body>
+
+<script th:inline="javascript">
+
+    function emCheck()  {
+    let form = document.getElementById("form");
+       if(!form.email.value) {
+        alert("이메일을 입력하세요");
+        return false;
+       }
+       return true;
+    }
+
+   //유효성 검사하기
+
+   var $email = $('#email');  //컬럼이메일
+   var $checkEmail = $('#checkEmail'); //ㅇ메일체크
+   var $memail = $('#memail'); //자기이메일
+   var $memailconfirm = $('#memailconfirm'); //입력받은이메일(검증을위한)
+   var $memailconfirmTxt = $('#memailconfirmTxt'); //인증받은번호입력
+   var $emcomfirm = $('#emcomfirm'); //입력받아 적용된 인증번호
+
+    // 이메일 인증번호
+   $checkEmail.click(function() {
+      $.ajax({
+         type : "POST",
+         url : "users/login/mailConfirm",
+         data : {
+            "email" : $email.val()
+         },
+         success : function(data){
+            alert("해당 이메일로 인증번호 발송이 완료되었습니다. \n 확인부탁드립니다.")
+            console.log("data : "+data);
+            EmailConfirm(data, $memailconfirm, $memailconfirmTxt);
+
+         }
+      })
+   })
+
+   // 이메일 인증번호 체크 함수
+   function EmailConfirm(data, $memailconfirm, $memailconfirmTxt){
+       $memailconfirm.on("keyup", function(){
+           if (data != $memailconfirm.val()) { //
+               emconfirm = false;
+               $memailconfirmTxt.html("<span id='emconfirm'>인증번호가 잘못되었습니다</span>")
+               $("#emconfirm").css({
+                   "color" : "#FA3E3E",
+                   "font-weight" : "bold",
+                   "font-size" : "10px"
+
+               })
+               //console.log("중복아이디");
+           } else { // 아니면 중복아님
+               emconfirm = true;
+
+               $memailconfirmTxt.html("<span id='emconfirm'>인증번호 확인 완료</span>")
+               $("#emconfirm").css({
+                   "color" : "#0D6EFD",
+                   "font-weight" : "bold",
+                   "font-size" : "10px"
+               })
+               $('#subBtn').attr('disabled',false); // 버튼 활성화
+               $('#email').attr('readonly',true); // 이메일 비활성화(수정못하게)
+               $('#memailconfirm').attr('readonly',true); // 인증번호 승인 시 비활성화
+               $('#checkEmail').attr('disabled',true); // 인증번호 승인 시 버튼 비활성화
+           }
+       })
+   }
+
+</script>
+</html>

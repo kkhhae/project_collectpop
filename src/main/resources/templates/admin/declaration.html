@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="layout/header :: header"></head>
+<link th:href="@{/assets/css/style-admin-declaration.css}" rel="stylesheet" type="text/css">
+<body data-spy="scroll" data-target=".onpage-navigation" data-offset="60">
+    <nav class="navbar navbar-custom navbar-fixed-top clearfix" role="navigation">
+        <div class="container">
+
+            <!--좌측 로고 -->
+            <div class="navbar-header">
+                <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#custom-collapse"><span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span>
+                    <span class="icon-bar"></span></button><a class="navbar-brand" th:href="@{/collectpop/admin/mainm}">COLLECTPOPS<span class="logomin">admin</span></a>
+            </div>
+
+            <!-- 우측 헤더 목록-->
+            <div class="collapse navbar-collapse" id="custom-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li class=""><a class="" th:href="@{/collectpop/admin/mainm}" >HOME</a> </li>
+                    <li class=""><a class="" href="#" >POPUPSTORE</a></li>
+                    <li class=""><a class="" href="#" >USERS</a></li>
+                    <li class=""><a class="" th:href="@{/collectpop/admin/declaration}" >DECLARATION</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- start declaration main start -->
+    <section id="declaration-section-wrap" class="container">
+        <a id="decExManaged" th:href="@{/collectpop/admin/decexmanaged}" class="btn btn-primary">신고 예시 내용 관리</a>
+        <table class="table shadow-shorter">
+            <thead>
+                <tr>
+                    <th scope="col" class="align-center">#</th>
+                    <th scope="col" class="align-center">신고된 피드 번호</th>
+                    <th scope="col" class="align-center">신고된 유저 이름</th>
+                    <th scope="col" class="align-center">신고 내용</th>
+                    <th scope="col" class="align-center">신고 횟수</th>
+                    <th scope="col" class="align-center">관리</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="board : ${decList}">
+                    <th scope="row" class="align-center" th:text="${board.did}">1</th>
+                    <td class="align-center" th:text="${board.fid}">Mark</td>
+                    <td class="align-center" th:text="${board.userId}">Mark</td>
+                    <td class="align-center" th:text="${board.declContent}">마음에 들지 않습니다.</td>
+                    <td class="align-center" th:text="${board.decnum}">@mdo</td>
+                    <td class="align-center"><button  class="deleteContent">삭제</button>&nbsp;&nbsp;<button class="cancle">취소</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+    <!-- end of decalaration main -->
+    <script src="/assets/lib/jquery/dist/jquery.js"></script>
+    <script src="/assets/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="/assets/lib/wow/dist/wow.js"></script>
+    <script src="/assets/lib/jquery.mb.ytplayer/dist/jquery.mb.YTPlayer.js"></script>
+    <script src="/assets/lib/isotope/dist/isotope.pkgd.js"></script>
+    <script src="/assets/lib/imagesloaded/imagesloaded.pkgd.js"></script>
+    <script src="/assets/lib/flexslider/jquery.flexslider.js"></script>
+    <script src="/assets/lib/owl.carousel/dist/owl.carousel.min.js"></script>
+    <script src="/assets/lib/smoothscroll.js"></script>
+    <script src="/assets/lib/magnific-popup/dist/jquery.magnific-popup.js"></script>
+    <script src="/assets/lib/simple-text-rotator/jquery.simple-text-rotator.min.js"></script>
+    <script src="/assets/js/plugins.js"></script>
+    <script src="/assets/js/main.js"></script>
+</body>
+</html>

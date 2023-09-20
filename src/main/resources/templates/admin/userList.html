@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en-US" dir="ltr" xmlns:th="http://www.thymeleaf.org">
+
+<!--Header 설정 -->
+<head th:replace="layout/header :: header"></head>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<style>
+
+
+  /* 테이블 스타일 */
+  .popup-store-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .popup-store-table th,
+  .popup-store-table td {
+    padding: 8px;
+    text-align: center;
+    border: 1px solid #ddd;
+  }
+
+  .popup-store-table th {
+    background-color: #f2f2f2;
+  }
+
+  .popup-store-table img {
+    max-width: 100px;
+    height: auto;
+  }
+
+  /* 세로 구분선 */
+  .popup-store-table th:not(:last-child),
+  .popup-store-table td:not(:last-child) {
+    border-right: none;
+  }
+
+  /* 가운데 정렬 */
+  .popup-store-table th,
+  .popup-store-table td {
+    vertical-align: middle;
+  }
+
+  .sort-container {
+    display: inline-flex; /* 인라인 플렉스 컨테이너로 설정하여 요소들을 한 줄에 정렬 */
+    align-items: center; /* 요소들을 수직으로 가운데 정렬 */
+    margin-right: 20px; /* 요소들 사이의 간격을 설정, 필요한 간격으로 조정 */
+  }
+
+  .search-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  #search-input {
+    width: 300px; /* 너비 조정 */
+  }
+
+
+</style>
+<!--body-->
+<body data-spy="scroll" data-target=".onpage-navigation" data-offset="60">
+<!-- body쪽 header처럼 되어 있는 내용들 -->
+<th:block th:replace="layout/startContent :: startContent"></th:block>
+
+<!-- Main Content들어갈 부분 -->
+
+<section class="module bg-dark-30 about-page-header" data-background="/assets/images/about_bg.jpg">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-6 col-sm-offset-3 text-center" >
+        <h1 class="module-title font-alt mb-0"> 유저 리스트 페이지</h1>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+
+<div class="row" style="overflow:auto;">
+  <table class="popup-store-table" id="store-list" style="overflow-x:auto; ">
+    <thead>
+    <tr>
+      <th>프로필사진</th>
+      <th>유저이름</th>
+      <th>닉네임</th>
+      <th>이메일</th>
+      <th>연락처</th>
+      <th>가입일</th>
+      <th>신고횟수</th>
+      <th>사용자/관리자</th>
+      <th>고객/스토어매니저</th>
+      <th>온라인/비활성화</th>
+      <th>비구독/구독</th>
+    </tr>
+    </thead>
+
+    <tbody>
+      <tr th:each="users,stat : ${userList}">
+        <td>
+          <img th:src="@{/collectpop/users/__${users.img}__}" style="width:100px; height:100px; margin: auto; padding-right:10%">
+<!--            <img th:src="@{${users.img}}" alt="유저 이미지" width="100">-->
+        </td>
+        <td th:text="${users.username}"></td>
+        <td th:text="${users.nickname}"></td>
+        <td th:text="${users.email}"></td>
+        <td th:text="${users.phoneNum}"></td>
+        <td th:text="${users.regDate}"></td>
+        <td th:text="${users.repCount}"></td>
+
+        <!--유저 권한 설정해주기-->
+        <td>
+          <span th:text="${users.role_access}" th:id="'roleAccessText' + ${stat.index}"></span>
+          <input type="hidden" th:id="'userAccess' + ${stat.index}" th:value="${users.userId}" />
+          <input type="hidden" th:id="'role_access' + ${stat.index}" th:value="${users.role_access}" />
+          <input type="button" value="변경" th:data-index="${stat.index}" name="accessChange">
+
+        </td>
+
+        <td>
+          <span th:text="${users.role_store}" id="roleStoreText + ${stat.index}"></span>
+          <input type="hidden" th:id="userStore + ${stat.index}" th:value="${users.userId}" />
+          <input type="hidden" th:id="role_store + ${stat.index}" th:value="${users.role_store}" />
+          <input type="button" value="변경" th:data-index="${stat.index}" name="storeChange">
+        </td>
+        <td>
+          <span th:text="${users.role_online}" id="roleOnlineText + ${stat.index}"></span>
+          <input type="hidden" th:id="userOnline + ${stat.index}" th:value="${users.userId}" />
+          <input type="hidden" th:id="role_online + ${stat.index}" th:value="${users.role_online}" />
+          <input type="button" value="변경" th:data-index="${stat.index}" name="onlineChange">
+        </td>
+        <td>
+          <span th:text="${users.role_read}" id="roleReadText + ${stat.index}"></span>
+          <input type="hidden" th:id="userRead + ${stat.index}" th:value="${users.userId}" />
+          <input type="hidden" th:id="role_read + ${stat.index}" th:value="${users.role_read}" />
+          <input type="button" value="변경" th:data-index="${stat.index}" name="readChange">
+        </td>
+      </tr>
+    </tbody>
+
+    </table>
+      <div class="row">
+        <ul class="pagination float-center">
+          <li th:if="${pageDTO.prev}" class="paginate_button page-item previous" id="dataTable_previous">
+            <a th:href="@{/admin/userList(pageNum=${pageDTO.startPage - 1},searchType=${pageDTO.pager.searchType},keyword=${pageDTO.pager.keyword})}" aria-controls="dataTable" data-dt-idx="0" tabindex="0" class="page-link">Previous</a>
+          </li>
+
+          <li th:each="page, pageStat : ${pageDTO.getPageNumList()}" class="paginate_button page-item" th:classappend="${pageDTO.pager.pageNum == page} ? 'active'">
+            <a th:href="@{/admin/userList(pageNum=${page},searchType=${pageDTO.pager.searchType},keyword=${pageDTO.pager.keyword})}" th:text="${page}" aria-controls="dataTable"  th:data-dt-idx="${pageStat.count}" tabindex="0" class="page-link"></a>
+          </li>
+
+          <li th:if="${pageDTO.next}" class="paginate_button page-item next" id="dataTable_next">
+            <a th:href="@{/admin/userList(pageNum=${pageDTO.endPage + 1},searchType=${pageDTO.pager.searchType},keyword=${pageDTO.pager.keyword})}" aria-controls="dataTable" th:data-dt-idx="${pageDTO.endPage}" tabindex="0" class="page-link">Next</a>
+          </li>
+        </ul>
+
+      </div>
+  </div>
+
+
+
+
+  <div class="row" style="overflow:auto;">
+    <form th:action="@{/collectpop/admin/userList}" method="get" class="d-none d-sm-inline-block form-inline mr-auto my-2 my-md-0 mw-100">
+      <input type="hidden" name="pageNum" value="1" th:value="${pageDTO.pager.pageNum}"/>
+      <input type="hidden" name="boardSize" value="10" th:value="${pageDTO.pager.boardSize}"/>
+      <input type="hidden" name="pageSize" value="10" th:value="${pageDTO.pager.pageSize}"/>
+      <div class="input-group">
+        <div class="dataTables_length mr-2" id="dataTable_length">
+          <label>
+            <select name="searchType" aria-controls="dataTable" class="custom-select custom-select-sm form-control form-control-sm ml-2">
+              <option th:selected="${pageDTO.pager.searchType == null}">---</option>
+              <option value="n" th:selected="${pageDTO.pager.searchType == 'n'}">닉네임</option>
+              <option value="e" th:selected="${pageDTO.pager.searchType == 'e'}">이메일</option>
+              <option value="r" th:selected="${pageDTO.pager.searchType == 'r'}">신고횟수</option>
+            </select>
+            <input type="text" name="keyword" th:value="${pageDTO.pager.keyword}" class="form-control border-0 small" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2" />
+            <button class="btn btn-primary" type="submit">검색</button>
+          </label>
+        </div>
+      </div>
+    </form>
+  </div>
+
+
+<!-- End Main Content -->
+
+<script>
+  var $accessChange = $("#accessChange");   //사용자,관리자
+  var $storeChange = $("#storeChange");     //회원,스토어매니저
+  var $onlineChange = $("#onlineChange");   //온라인,비활성화
+  var $readChange = $("#readChange");       //구독,비구독
+  var userId = $("#users.userId").val();      //각각 맞게 userId값 가져오기
+
+
+    //사용자, 관리자 변경
+    $("[name=accessChange]").click(function() {
+
+       var index = $(this).data('index');
+       var userId = $("#userAccess" + index).val();
+       var role_access = $("#role_access" + index).val();
+       console.log("load " + role_access);
+       var $currentRow = $(this).closest('tr');
+       var $roleAccessText = $currentRow.find("[id^='roleAccessText']");
+
+
+         $.ajax({
+            type: "POST",
+            url: "accessChange",
+            data: {
+                "userId": userId
+            },
+            success: function(data) {
+                if (data === "Success") {
+                    console.log("DB 업데이트 및 변경 완료");
+                    console.log("before User : " + role_access);
+                    if (role_access === "USER") {
+                        role_access = "ADMIN";
+                    } else if (role_access === "ADMIN") {
+                        role_access = "USER";
+                    }
+                    console.log("after User : " + role_access);
+
+                    $roleAccessText.text(role_access);  // 화면의 텍스트 업데이트
+                    $("#role_access" + index).val(role_access);  // 숨겨진 입력 필드의 값 업데이트
+                } else {
+                    console.log(data); // 실패 메시지 출력
+                }
+            },
+
+            error: function(xhr, status, error) {
+                console.log("Error: " + xhr.responseText);
+            }
+         });
+
+    });
+
+  //고객, 스토어매니저 변경
+    $("[name=storeChange]").click(function() {
+
+       var index = $(this).data('index');
+       var userId = $("#userStore" + index).val();
+       var role_store = $("#role_store" + index).val();
+       console.log("load " + role_store);
+       var $currentRow = $(this).closest('tr');
+       var $roleStoreText = $currentRow.find("[id^='roleStoreText']");
+
+
+         $.ajax({
+            type: "POST",
+            url: "storeChange",
+            data: {
+                "userId": userId
+            },
+            success: function(data) {
+                if (data === "Success") {
+                    console.log("DB 업데이트 및 변경 완료");
+                    console.log("before User : " + role_store);
+                    if (role_store === "MEMBER") {
+                        role_store = "STOREMANAGER";
+                    } else if (role_store === "STOREMANAGER") {
+                        role_store = "MEMBER";
+                    }
+                    console.log("after User : " + role_store);
+
+                    $roleStoreText.text(role_store);  // 화면의 텍스트 업데이트
+                    $("#role_store" + index).val(role_store);  // 숨겨진 입력 필드의 값 업데이트
+                } else {
+                    console.log(data); // 실패 메시지 출력
+                }
+            },
+
+            error: function(xhr, status, error) {
+                console.log("Error: " + xhr.responseText);
+            }
+         });
+
+    });
+
+  //온라인,비활성화 변경
+    $("[name=onlineChange]").click(function() {
+
+       var index = $(this).data('index');
+       var userId = $("#userOnline" + index).val();
+       var role_online = $("#role_online" + index).val();
+       console.log("load " + role_online);
+       var $currentRow = $(this).closest('tr');
+       var $roleOnlineText = $currentRow.find("[id^='roleOnlineText']");
+
+
+         $.ajax({
+            type: "POST",
+            url: "onlineChange",
+            data: {
+                "userId": userId
+            },
+            success: function(data) {
+                if (data === "Success") {
+                    console.log("DB 업데이트 및 변경 완료");
+                    console.log("before User : " + role_online);
+                    if (role_online === "ACTIVE") {
+                        role_online = "DISABLED";
+                    } else if (role_online === "DISABLED") {
+                        role_online = "ACTIVE";
+                    }
+                    console.log("after User : " + role_online);
+
+                    $roleOnlineText.text(role_online);  // 화면의 텍스트 업데이트
+                    $("#role_online" + index).val(role_online);  // 숨겨진 입력 필드의 값 업데이트
+                } else {
+                    console.log(data); // 실패 메시지 출력
+                }
+            },
+
+            error: function(xhr, status, error) {
+                console.log("Error: " + xhr.responseText);
+            }
+         });
+
+    });
+
+  //구독,비구독 변경
+    $("[name=readChange]").click(function() {
+
+       var index = $(this).data('index');
+       var userId = $("#userRead" + index).val();
+       var role_read = $("#role_read" + index).val();
+       console.log("load " + role_read);
+       var $currentRow = $(this).closest('tr');
+       var $roleReadText = $currentRow.find("[id^='roleReadText']");
+
+
+         $.ajax({
+            type: "POST",
+            url: "readChange",
+            data: {
+                "userId": userId
+            },
+            success: function(data) {
+                if (data === "Success") {
+                    console.log("DB 업데이트 및 변경 완료");
+                    console.log("before User : " + role_read);
+                    if (role_read === "SUB") {
+                        role_read = "NONSUB";
+                    } else if (role_read === "NONSUB") {
+                        role_read = "SUB";
+                    }
+                    console.log("after User : " + role_read);
+
+                    $roleReadText.text(role_read);  // 화면의 텍스트 업데이트
+                    $("#role_read" + index).val(role_read);  // 숨겨진 입력 필드의 값 업데이트
+                } else {
+                    console.log(data); // 실패 메시지 출력
+                }
+            },
+
+            error: function(xhr, status, error) {
+                console.log("Error: " + xhr.responseText);
+            }
+         });
+
+    });
+
+</script>
+
+
+
+<!-- Footer 붙히기 -->
+<th:block th:replace="layout/footer :: footer"></th:block>
+</body>
+</html>

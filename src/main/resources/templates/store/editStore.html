@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en-US" dir="ltr" xmlns:th="http://www.thymeleaf.org">
+
+<!--Header 설정 -->
+<head th:replace="layout/header :: header"></head>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script type="text/javascript"
+        src="//dapi.kakao.com/v2/maps/sdk.js?appkey=919031db26e53a5834e1f3419bc1450d&libraries=services"></script>
+
+<style>
+    .store-detail-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .store-image img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .store-info table {
+        margin-top: 20px;
+    }
+
+    .hash-info {
+        margin-top: 20px;
+    }
+
+    .store-description {
+        margin-top: 20px;
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.8);
+    }
+
+    .modal-content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: auto;
+        padding: 20px;
+        background-color: white;
+        width: 80%;
+        max-width: 800px;
+        height: auto;
+        text-align: center;
+    }
+
+    .modal-image {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        font-size: 30px;
+        font-weight: bold;
+        color: black;
+        cursor: pointer;
+    }
+
+
+    .tab {
+        font-size: 20px;
+
+    }
+    /* 탭 활성화 스타일 */
+    .tab.active {
+        color: #FF5733; /* 원하는 활성화 색상으로 변경 */
+        font-weight: bold;
+    }
+    .tab-container {
+        display: flex;
+        justify-content: space-between;
+
+    }
+
+    .tab-gap {
+        width: 20px;
+    }
+
+    /* 탭 클릭 시 커서 포인터로 변경 */
+    .tab {
+        cursor: pointer;
+    }
+
+    .comment-input-container {
+        background-color: #f7f7f7;
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin-top: 20px;
+    }
+
+    .comment-input-container textarea {
+        width: 100%;
+        padding: 5px;
+    }
+
+    .comment-input-container button {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+    }
+
+    /* 댓글 스타일 */
+    .comment-item {
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        padding: 10px;
+    }
+
+    .comment-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 5px;
+    }
+
+    .comment-header strong {
+        font-size: 18px;
+    }
+
+    .comment-header span {
+        font-size: 12px;
+        color: #777;
+    }
+
+</style>
+<!--body-->
+<body data-spy="scroll" data-target=".onpage-navigation" data-offset="60">
+<!-- body쪽 header처럼 되어 있는 내용들 -->
+<th:block th:replace="layout/startContent :: startContent"></th:block>
+
+<!-- Main Content들어갈 부분 -->
+
+
+<section class="module bg-dark-30 about-page-header" data-background="assets/images/about_bg.jpg">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-6 col-sm-offset-3">
+                <h1 class="module-title font-alt mb-0"> 스토어 수정페이지 </h1>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 뒤로가기 버튼 -->
+<a href="#" onclick="goBack()">뒤로가기</a>
+
+
+<h1> 스토어 정보 수정하기</h1>
+
+<!-- 수정 폼 -->
+<form class="validation-form" action="/collectpop/store/updateStore" method="post" id="signupForm" enctype="multipart/form-data" onsubmit="return validateForm();">
+    <!-- 스토어 정보 수정 필드 -->
+    <input type="hidden" name="psId" th:value="${storeDetail.psId}">
+    <input type="hidden" id="storeDetailJson" name="storeDetailJson" value="${#jsonString(storeDetail)}">
+
+
+    <div class="store-image">
+        <label>1.대표사진:</label>
+        <img id="thumbnailPreview" class="thumbnail-image" alt="대표사진"
+             th:src="@{/collectpop/store/thumbnail/{fileName}(fileName=${storeDetail.thumbnail})}"
+             onclick="openModal(this)">
+        <input type="file" id="thumbnailImage" name="thumbnailImage" accept="image/*" onchange="previewImage('thumbnailImage', 'thumbnailPreview')">
+    </div>
+
+    <div>
+        <label for="name">2.스토어 이름:</label>
+        <input type="text" id="name" name="name" th:value="${storeDetail.name}">
+    </div>
+
+    <div>
+        <label for="startDate">3.시작 날짜:</label>
+        <input type="date" id="startDate" name="startDate" th:value="${storeDetail.startDate}">
+        <label><input type="checkbox" name="startDateIsNull" id="startDateIsNull" value="true" onchange="toggleDateField('startDate')"/> 모름 / 미정</label>
+    </div>
+
+    <div>
+        <label for="endDate">4.종료 날짜:</label>
+        <input type="date" id="endDate" name="endDate" th:value="${storeDetail.endDate}">
+        <label><input type="checkbox" name="endDateIsNUll" id="endDateIsNull" value="true" onchange="toggleDateField('endDate')"/> 모름 / 미정</label>
+    </div>
+
+    <div>
+        <label for="fee">5.입장료:</label>
+        <input type="text" id="fee" name="fee" th:value="${storeDetail.fee}">원
+        <input type="checkbox" name="noFee" id="noFee" onchange="toggleFeeField()"> 무료
+    </div>
+
+
+    <div>
+        <label th:for="address">6.주소:</label>
+        <div class="card-header py-3">
+            <h3 class="m-0 font-weight-bold text-dark">Map11
+                <div class="float-right">
+                    <input type="text"th:id="sample5_address" placeholder="주소" th:value="${storeDetail.address}">
+                    <input type="button" th:onclick="sample5_execDaumPostcode()" value="주소 검색"><br>
+                    <div id="map" style="width: 60%; height: 400px; justify-content: center;"></div> <!-- 스타일 수정 -->
+                </div>
+            </h3>
+        </div>
+    </div>
+
+    <!-- 주소 검색 -->
+    <script th:inline="javascript">
+        function searchDetailAddrFromCoords(latLng, callback) {
+            var geocoder = new kakao.maps.services.Geocoder();
+            geocoder.coord2Address(latLng.getLng(), latLng.getLat(), callback);
+        }
+
+        // 주소 검색
+        function sample5_execDaumPostcode() {
+
+            // 주소 입력 상자의 현재 값 가져오기
+            var addressInput = document.getElementById("sample5_address");
+            var address = addressInput.value;
+
+            // 주소가 비어있을 경우 알림을 표시하고 함수 종료
+            if (address === "") {
+                alert("주소를 입력해주세요.");
+                return;
+            }
+
+            new daum.Postcode({
+                oncomplete: function(data) {
+                    var addr = data.address;
+                    document.getElementById("sample5_address").value = addr;
+                    console.log("addr : " + addr);
+                    geocoder.addressSearch(data.address, function(results, status) {
+                        if (status === daum.maps.services.Status.OK) {
+                            var result = results[0];
+                            var coords = new daum.maps.LatLng(result.y, result.x);
+                            // 지도를 옮기고, 마커를 표시합니다
+                            map.panTo(coords);  // 지도를 해당 좌표로 이동합니다.
+                            marker.setPosition(coords);
+                        }
+                    });
+                }
+            }).open();
+        }
+        var mapContainer = document.getElementById('map'), // 지도를 표시할 div
+            mapOption = {
+                center: new kakao.maps.LatLng(37.566826, 126.9786567), // 지도의 중심좌표
+                level: 1 // 지도의 확대 레벨
+            };
+
+        // 지도를 생성합니다
+        var map = new kakao.maps.Map(mapContainer, mapOption);
+
+        // 주소-좌표 변환 객체를 생성합니다
+        var geocoder = new kakao.maps.services.Geocoder();
+
+        var marker = new kakao.maps.Marker({
+            position: map.getCenter()
+        });
+
+        function setLatLon(lat, lon) {
+            document.getElementById("hiddenLat").value = lat;
+            document.getElementById("hiddenLng").value = lon;
+        }
+
+        var lat, lon;
+        // 실행 시 지도 위치 변경
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                var coord = new kakao.maps.LatLng(37.56496830314491, 126.93990862062978);
+
+                var callback = function (result, status) {
+                    if (status === kakao.maps.services.Status.OK) {
+                        console.log(result[0].address.address_name);
+                        document.getElementById("hiddenAddress").value = result[0].address.address_name;
+                    }
+                };
+                geocoder.coord2Address(coord.getLng(), coord.getLat(), callback);
+
+                var lat = position.coords.latitude, // 위도
+                    lon = position.coords.longitude; // 경도
+
+                var locPosition = new kakao.maps.LatLng(lat, lon); // 마커
+
+                setLatLon(lat, lon);
+
+                console.log(lat, lon);
+                marker.setPosition(locPosition);
+                map.setCenter(locPosition);
+            })
+        }
+        ;
+        //지도를 클릭했을 때 클릭 위치 좌표에 대한 주소정보를 표시하도록 이벤트를 등록합니다
+        kakao.maps.event.addListener(map, 'click', function (mouseEvent) {
+            searchDetailAddrFromCoords(mouseEvent.latLng, function (result, status) {
+                if (status === kakao.maps.services.Status.OK) {
+
+                    var latlng = mouseEvent.latLng;
+                    var message = '클릭한 위치의 위도는 ' + latlng.getLat() + ' 이고, ';
+                    message += '경도는 ' + latlng.getLng() + ' 입니다';
+                    console.log(message)
+                    document.getElementById("hiddenAddress").value = result[0].address.address_name;
+                    document.getElementById("hiddenLat").value = latlng.getLat();
+                    document.getElementById("hiddenLng").value = latlng.getLng()
+                    // 마커를 클릭한 위치에 표시합니다
+                    marker.setPosition(mouseEvent.latLng);
+                    marker.setMap(map);
+                }
+            });
+        });
+
+        function validateForm() {
+            // 위도와 경도 좌표값 , 주소 가져오기
+            var latitude = document.getElementById("hiddenLat").value;
+            var longitude = document.getElementById("hiddenLng").value;
+            var address = document.getElementById("hiddenAddress").value;
+
+            var nameInput = document.getElementById("psName");
+            var imageFileInput = document.getElementById("imageFile");
+            var startDateInput = document.getElementById("startDate");
+            var endDateInput = document.getElementById("endDate");
+
+            var name = nameInput.value;
+            var imageFile = imageFileInput.value;
+            var startDate = new Date(startDateInput.value);
+            var endDate = new Date(endDateInput.value);
+
+            if (name === "") {
+                alert("스토어 이름을 입력해주세요.");
+                return false; // 폼 제출 중단
+            }
+
+            if (imageFile === "") {
+                alert("대표 이미지를 첨부해주세요.");
+                return false; // 폼 제출 중단
+            }
+
+
+            if (endDate < startDate) {
+                alert("끝나는날짜는 시작날짜보다 빠를 수 없습니다.");
+                return false;
+            }
+            if(!address){
+                alert("정확한 위치를 찍어주세요");
+                return false;
+            }
+            if(!address) {
+                alert("주소를 입력해주세요.");
+            }
+            if(!latitude && !longitude) {
+                alert("지도를 클릭해 정확한 위치를 알려주세요.");
+            }
+            return true;
+        }
+    </script>
+    <div class="input-form-background row justify-content-end">
+        <div class="py-3 float-right">
+            <input type="hidden" name="latitude" th:id="hiddenLat"/>
+            <input type="hidden" name="longitude" th:id="hiddenLng"/>
+            <input type="hidden" name="address" th:id="hiddenAddress"/>
+        </div>
+    </div>
+
+
+
+    <div>
+        <label for="content">7.스토어 상세 정보:</label>
+        <textarea id="content" name="content" rows="4" cols="50" th:text="${storeDetail.content}"></textarea>
+    </div>
+
+
+    <!-- 추가 해시태그 입력 필드와 추가 버튼 -->
+    <div>
+        <label for="hashtags">8.해시태그 (최대 5개)</label>
+        <input type="text" name="hashtagInput" id="hashtags" class="form-control">
+        <button type="button" class="btn btn-dark btn-block" id="addHashtagButton" >추가</button>
+    </div>
+
+    <!-- 기존 해시태그+ 추가해시태그 표시 -->
+    <div>
+        <label for="hashtagList">해시태그:</label>
+        <div id="hashtagList">
+        <span th:each="hashtag, hashtagIndex : ${storeDetail.hashtags}" class="badge badge-primary">
+            <span th:text="'#' + ${#strings.unescapeJava(hashtag.replace('[', '').replace(']', '').replace('&quot;', ''))}"></span>
+            <button type="button" class="btn btn-danger btn-sm ml-2"
+                    th:attr="onclick='removeHashtag(\'' + ${#strings.unescapeJava(hashtag.replace('[', '').replace(']', '').replace('&quot;', ''))} + '\')'">삭제</button>
+        </span>
+        </div>
+    </div>
+    <!-- 히든으로 입력받은 해시태그 값 넘김 -->
+    <input type="hidden" name="hashtagValues" id="hashtagValues" />
+
+
+
+
+
+    <div class="additional-photos">
+        <h2>추가사진</h2>
+        <div class="photo-list">
+            <div th:each="photo,status  : ${storeDetail.additionalPhotos}">
+                <div class="photo">
+                    <img th:src="@{/collectpop/store/additional/{fileName}(fileName=${photo.photoPath})}" alt="추가사진" onclick="toggleModal(this)">
+                    <button type="button" class="delete-button" th:onclick="removePhoto(this, [[${photo.photoPath}]])">삭제</button>
+                </div>
+            </div>
+        </div>
+        <p>기존 이미지 파일 개수: <span th:text="${#lists.size(storeDetail.additionalPhotos)}"></span></p>
+        <div>
+            <p>최대 4장까지의 이미지를 선택할 수 있습니다(기존파일 + 새로추가한 파일)</p>
+        </div>
+        <input type="file" id="additionalImages" name="additionalImages" accept="image/*" multiple onchange="previewMultipleImages('additionalImages', 'additionalImagesPreview')">
+        <div id="additionalImagesPreview"></div>
+        <p id="imageCountWarning" style="color: red;"></p> <!-- 경고 메시지를 표시할 요소 추가 -->
+        <!-- 취소 버튼 추가 -->
+        <button type="button" onclick="resetFileInputAndImagePreview('additionalImages', 'additionalImagesPreview')">입력사진 초기화</button>
+    </div>
+
+    <!-- 수정 내용을 서버로 전송하는 버튼 -->
+    <div class="col-md-6 mb-3">
+        <input type="submit" id="updateStore" class="btn btn-dark btn-block" value="수정하기" onclick="submitForm();"/>
+    </div>
+</form>
+
+
+
+<div class="back-to-list">
+    <a href="/collectpop/store/storeList">리스트로 돌아가기</a>
+</div>
+
+</div>
+
+
+<!-- 모달 팝업 -->
+<div id="myModal" class="modal" onclick="closeModal()">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <img id="modalImage" class="modal-content">
+</div>
+
+
+
+
+<script th:inline="javascript">
+    // 해시태그 배열 초기화
+    var hashtagsArray = [];
+
+    // 기존 해시태그 저장값 가져오는 부분
+    $("#hashtagList .badge").each(function() {
+        var hashtagText = $(this).find("span").text(); // 해시태그 텍스트 가져오기
+        hashtagsArray.push(hashtagText.substring(1)); // "#" 문자를 제외한 텍스트를 배열에 추가
+    });
+
+    // Enter 키 입력 이벤트 처리
+    $("#hashtags").keypress(function(event) {
+        if (event.which === 13) { // 13은 Enter 키의 키 코드입니다.
+            event.preventDefault(); // 기본 Enter 동작을 막습니다.
+            $("#addHashtagButton").click(); // 추가 버튼을 클릭한 것처럼 동작합니다.
+        }
+    });
+
+    // 추가 버튼 클릭 시
+    $("#addHashtagButton").click(function() {
+        // 입력된 해시태그 가져오기
+        var newHashtag = $("#hashtags").val();
+
+        // 빈 문자열 확인
+        if (newHashtag.trim() === "") {
+            alert("빈 해시태그는 추가할 수 없습니다.");
+            return; // 추가 중단
+        }
+
+        // 이미 있는지 확인
+        if (hashtagsArray.indexOf(newHashtag) === -1) {
+            // 최대 5개까지만 추가
+            if (hashtagsArray.length < 5) {
+                // 배열에 추가
+                hashtagsArray.push(newHashtag);
+
+                // 해시태그 목록 업데이트
+                updateHashtagList();
+
+                // 로그 출력: 추가된 해시태그 목록 확인
+                console.log("추가된 해시태그 목록: ", hashtagsArray);
+
+
+            } else {
+                alert("최대 5개의 해시태그만 추가할 수 있습니다.");
+            }
+        } else {
+            alert("이미 추가된 해시태그입니다.");
+        }
+
+        // 입력 필드 비우기
+        $("#hashtags").val("");
+    });
+
+    function removeHashtag(hashtagToRemove) {
+        // 선택한 해시태그를 배열에서 제거
+        var indexToRemove = hashtagsArray.indexOf(hashtagToRemove);
+        if (indexToRemove !== -1) {
+            hashtagsArray.splice(indexToRemove, 1);
+
+            // 화면에서도 해당 해시태그 엘리먼트를 제거
+            $("#hashtagList .badge:contains(" + hashtagToRemove + ")").remove();
+
+            // 히든 필드에 값 업데이트
+            $("#hashtagValues").val(JSON.stringify(hashtagsArray));
+
+            // 로그 출력: 삭제된 해시태그 확인
+            console.log("삭제된 해시태그: ", hashtagToRemove);
+            // 로그 출력: 업데이트된 해시태그 목록 확인
+            console.log("업데이트된 해시태그 목록: ", hashtagsArray);
+
+
+        }
+    }
+
+    // 해시태그 목록 업데이트 함수
+    function updateHashtagList() {
+        // 현재 해시태그 목록을 비우기
+        $("#hashtagList").empty();
+
+        // 기존 해시태그 목록을 가져와서 업데이트
+        $("#hashtagList .badge").each(function() {
+            var hashtagText = $(this).find("span").text(); // 해시태그 텍스트 가져오기
+            var hashtag = hashtagText.substring(1); // "#" 문자를 제외한 텍스트
+            appendHashtag(hashtag);
+        });
+
+        // 추가된 해시태그 목록을 업데이트
+        for (var i = 0; i < hashtagsArray.length; i++) {
+            var hashtag = hashtagsArray[i];
+            appendHashtag(hashtag);
+        }
+
+        // 히든 필드에 값 설정
+        $("#hashtagValues").val(JSON.stringify(hashtagsArray));
+
+        // 로그 출력: 업데이트된 해시태그 목록 확인
+        console.log("업데이트된 해시태그 목록: ", hashtagsArray);
+
+    }
+
+    // 해시태그를 표시하고 삭제 버튼 추가하는 함수
+    function appendHashtag(hashtag) {
+        var hashtagElement = $("<span></span>").text("#" + hashtag);
+        var deleteButton = $("<button></button>").text("삭제").addClass("btn btn-danger btn-sm ml-2");
+        deleteButton.click(function() {
+            removeHashtag(hashtag);
+        });
+        var badge = $("<span></span>").addClass("badge badge-primary");
+        badge.append(hashtagElement, deleteButton);
+        $("#hashtagList").append(badge);
+
+        // 히든 필드에 값 업데이트
+        $("#hashtagValues").val(JSON.stringify(hashtagsArray));
+    }
+</script>
+
+
+<!-- 폼 제출 시에 호출될 함수 추가 -->
+<script th:inline="javascript">
+    function submitForm() {
+        // hashtagValues 배열을 숨겨진 입력 필드의 값으로 설정
+        document.getElementById("hashtagValues").value = JSON.stringify(hashtagsArray);
+        // 폼 제출
+        document.getElementById("signupForm").submit();
+    }
+</script>
+
+
+<!-- 추가이미지 개수 계산 경고표시 -->
+<script th:inline="javascript">
+    document.getElementById("additionalImages").addEventListener("change", function(event) {
+        var maxImages = 4;
+        var inputFiles = event.target.files;
+        var currentImageCount = document.querySelectorAll('.photo-list .photo').length; // 기존 이미지 파일 개수
+
+        if (currentImageCount + inputFiles.length > maxImages) {
+            event.preventDefault(); // 파일 추가 이벤트 취소
+
+            var errorMessage = "최대 " + maxImages + "장까지만 업로드 가능합니다.";
+            document.getElementById("imageCountWarning").textContent = errorMessage;
+        } else {
+            document.getElementById("imageCountWarning").textContent = "";
+        }
+    });
+</script>
+
+
+<!--기존의 추가이미지 삭제 버튼 클릭 시 서버랑 DB에서 바로 삭제 -->
+<script th:inline="javascript">
+    function removePhoto(deleteButton, photoPath) {
+        console.log("delete button!!!");
+        var photoDiv = deleteButton.parentElement;
+        photoDiv.remove();
+
+        // 서버에 삭제 요청 전송
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/collectpop/store/removePhoto", true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                // 삭제 완료 후 처리할 내용
+            }
+        };
+        var data = JSON.stringify(photoPath);
+        xhr.send(data);
+    }
+</script>
+
+
+
+<script th:inline="javascript">
+    var modalOpen = false; // 모달 상태 변수 추가
+
+    function openModal(clickedImg) {
+        var modal = document.getElementById('myModal');
+        var modalImg = document.getElementById('modalImage');
+        modal.style.display = 'block';
+        modalImg.src = clickedImg.src;
+
+        modalOpen = true; // 모달 열림 상태로 변경
+    }
+
+    function closeModal() {
+        var modal = document.getElementById('myModal');
+        modal.style.display = 'none';
+
+        modalOpen = false; // 모달 닫힘 상태로 변경
+    }
+
+    // 이미지 클릭 시 모달 열거나 닫기
+    function toggleModal(clickedImg) {
+        if (modalOpen) {
+            closeModal();
+        } else {
+            openModal(clickedImg);
+        }
+    }
+
+    // 이미지 클릭 시 모달 닫기 (추가한 부분)
+    function closeByClickingImage() {
+        if (modalOpen) {
+            closeModal();
+        }
+    }
+</script>
+
+<!-- 이미지 미리보기 함수 추가 -->
+<script th:inline="javascript">
+    function previewImage(inputId, previewId) {
+        var input = document.getElementById(inputId);
+        var preview = document.getElementById(previewId);
+        var reader = new FileReader();
+
+        reader.onload = function (e) {
+            preview.src = e.target.result;
+        };
+
+        if (input.files.length > 0) {
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function previewMultipleImages(inputId, previewId) {
+        var input = document.getElementById(inputId);
+        var preview = document.getElementById(previewId);
+        preview.innerHTML = '';
+
+        for (var i = 0; i < input.files.length; i++) {
+            var reader = new FileReader();
+            var img = document.createElement('img');
+            img.className = 'thumbnail-image';
+            img.style.marginRight = '10px';
+
+
+            reader.onload = (function (img) {
+                return function (e) {
+                    img.src = e.target.result;
+                };
+            })(img);
+
+            reader.readAsDataURL(input.files[i]);
+            preview.appendChild(img);
+        }
+    }
+
+    function resetFileInput(inputId) {
+        var input = document.getElementById(inputId);
+        input.value = ''; // 파일 입력 엘리먼트를 초기화하여 선택한 파일 취소
+    }
+
+    function resetImagePreview(previewId) {
+        var preview = document.getElementById(previewId);
+        preview.innerHTML = ''; // 이미지 미리보기를 비워줍니다.
+    }
+
+    function resetFileInputAndImagePreview(inputId, previewId) {
+        resetFileInput(inputId); // 파일 입력 초기화
+        resetImagePreview(previewId); // 이미지 미리보기 초기화
+
+        // 파일 입력 초기화 후 경고 메시지도 초기화
+        document.getElementById("imageCountWarning").textContent = "";
+    }
+
+</script>
+
+<!-- 입장료 없을경우 0원으로 입력 체크박스-->
+<script th:inline="javascript">
+    function toggleFeeField() {
+        var feeCheckbox = document.getElementById("noFee");
+        var feeInput = document.getElementById("fee"); // 입장료 입력 필드 요소
+
+        if (feeCheckbox.checked) {
+            feeInput.disabled = true; // 입장료 입력 필드 비활성화
+            feeInput.value = "0"; // 체크되었을 때 0으로 값을 설정
+        } else {
+            feeInput.disabled = false; // 입장료 입력 필드 활성화
+            feeInput.value = ""; // 체크가 해제되었을 때 입력값 초기화
+        }
+    }
+</script>
+
+<script>
+    function goBack() {
+        window.history.back();
+    }
+</script>
+
+<!-- 스토어 기간 모름/미정 체크시 날짜입력 비활성화 -->
+<script th:inline="javascript">
+    function toggleDateField(fieldId) {
+        var checkboxId = fieldId + "IsNull";
+        var dateField = document.getElementById(fieldId);
+        var checkbox = document.getElementById(checkboxId);
+
+        console.log("Checkbox checked:", checkbox.checked); // 체크박스의 체크 상태 확인
+
+        if (checkbox.checked) {
+            console.log("checked : " + checkbox.checked);
+            dateField.disabled = true;
+            dateField.value = "";
+        } else {
+            console.log("else : " + checkbox.checked);
+            dateField.disabled = false;
+        }
+    }
+</script>
+
+
+
+<!-- End Main Content -->
+
+<!-- Footer 붙히기 -->
+<th:block th:replace="layout/footer :: footer"></th:block>
+</body>
+</html>

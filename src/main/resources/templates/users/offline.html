@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en-US" dir="ltr" xmlns:th="http://www.thymeleaf.org">
+
+<!--Header 설정 -->
+<head th:replace="layout/header :: header"></head>
+
+
+<style>
+
+    /* div태그 css구역 */
+.links-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.right-links {
+    display: flex;
+    gap: 10px; /* 각 링크 사이의 간격 설정 */
+}
+
+
+
+
+</style>
+<!--body-->
+
+<body data-spy="scroll" data-target=".onpage-navigation" data-offset="60" style="">
+<!-- body쪽 header처럼 되어 있는 내용들 -->
+<th:block th:replace="layout/startContent :: startContent"></th:block>
+<!-- Main Content들어갈 부분 -->
+
+<div class="main">
+    <div class="container" style="width:50%;">
+        <div class="row">
+            <div class="col-12 col-sm-5 col-sm-offset-1 mb-sm-40" style="width:80%;">
+                <div class="row">
+
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <h4 class="font-alt" style="text-align:center;">비활성화</h4>
+                    <br>
+                    <hr class="divider-w mb-10">
+                    <form class="form" action="" th:action th:object="${users}" method="post" id="form" >
+
+                        <br>
+                        정말 떠나실건가요?
+                        <br>
+                        서비스 기간 명시(90일) 후 자동으로 회원정보가 삭제됩니다.
+                        <br>
+                        <div class="privacy_tit">비활성화에 동의하시면 체크해주시기 바랍니다.
+                            <input type="checkbox" id="offline_check" name="offline_check" /></div>
+                        <br>
+                        <hr class="divider-w mb-10">
+                        <button class="btn btn-block btn-round btn-b" type="submit"  onsubmit="return fieldCheck()">동의</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- End Main Content -->
+
+
+<!-- Footer 붙히기 -->
+<th:block th:replace="layout/footer :: footer"></th:block>
+</body>
+
+<script th:inline="javascript">
+
+    function fieldCheck() {
+        let form = document.getElementById("form");
+
+            if(!form.offline_check.checked) {
+                 alert("비활성화를 원할 시 동의해주세요");
+                 return false;
+            }
+        return true;
+    }
+
+</script>
+</html>

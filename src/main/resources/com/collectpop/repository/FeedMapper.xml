@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.collectpop.repository.FeedMapper">
+    <sql id="search">
+        <where>
+            <if test="keyword != null">
+                f.content like '%' || #{keyword} || '%'
+                or h.tagName like '%' || #{keyword} || '%'
+            </if>
+        </where>
+    </sql>
+
+    <select id="getFeedLoadData" resultType="FeedImg">
+        <![CDATA[
+        select r, B.* from
+            (select rownum r, A.* from
+                (SELECT f.fid, COALESCE(f.content, ''), MAX(i.fileName) AS fileName,MAX(h.tagName) AS tagName
+                FROM feed f
+                JOIN feedImg i ON f.fid = i.fid
+                JOIN feedHashTag h ON f.fid = h.fid
+        ]]>
+                <include refid="search"/>
+        <![CDATA[
+                GROUP BY f.fid, f.content
+                ORDER BY f.fid desc) A
+            where rownum <= (#{page} * #{feedSize})) B
+        where r > (#{page} - 1) * #{feedSize}
+        ]]>
+    </select>
+    <select id="getFidOfFeedImg" resultType="FeedImg">
+        select * from feedImg where fid = #{fid}
+    </select>
+    <select id="getFeedLikes" resultType="Long">
+        select likes from feed where fid = #{fid}
+    </select>
+    <select id="getFeedViews" resultType="Long">
+        select views from feed where fid = #{fid}
+    </select>
+    <select id="getFeedContent" resultType="String">
+        select content from feed where fid = #{fid}
+    </select>
+    <select id="getFeedLikesCheck" resultType="Int">
+        select count(*) from likesCheck where fid = #{fid} and userId = #{userId}
+    </select>
+    <update id="updateFeedLikesUp">
+        update feed
+        set likes = likes + 1
+        where fid = #{fid}
+    </update>
+    <update id="updateFeedLikesDown">
+        update feed
+        set likes = likes - 1
+        where fid = #{fid}
+    </update>
+    <insert id="insertLikesCheck">
+        <selectKey keyProperty="lid" resultType="long" order="BEFORE">
+            select likesCheck_seq.nextval from dual
+        </selectKey>
+        insert into likesCheck(lid, fid, userId)
+        values(#{lid}, #{fid}, #{userId})
+    </insert>
+    <delete id="deleteLikeCheck">
+        delete from likesCheck where fid = #{fid} and userId = #{userId}
+    </delete>
+    <insert id="insertFeed">
+        <selectKey keyProperty="fid" resultType="long" order="BEFORE">
+            select feed_seq.nextval from dual
+        </selectKey>
+        insert into feed(fid, userId, content, likes, views, regDate)
+        values(#{fid}, #{userId}, #{content}, 0, 0, sysdate)
+    </insert>
+    <insert id="insertFeedImg">
+        <selectKey keyProperty="fiid" resultType="long" order="BEFORE">
+            select feedImg_seq.nextval from dual
+        </selectKey>
+            insert into feedImg(fiid, fid, fileName, orgFileName)
+            values(#{fiid}, #{fid}, #{fileName}, #{orgFileName})
+    </insert>
+    <insert id="insertFeedHashTag">
+        <selectKey keyProperty="fhid" resultType="long" order="BEFORE">
+            select feedHT_seq.nextval from dual
+        </selectKey>
+        insert into feedHashTag(fhid, fid, tagName)
+        values(#{fhid}, #{fid}, #{tagName})
+    </insert>
+    <insert id="insertReplies">
+        <selectKey keyProperty="frid" resultType="long" order="BEFORE">
+            select fr_seq.nextval from dual
+        </selectKey>
+        insert into feedReply(frid, fid, userId, content, regDate)
+        values(#{frid}, #{fid}, #{userId}, #{content}, sysdate)
+    </insert>
+    <select id="getFidOfReplies" resultType="com.collectpop.dto.ReplyDTO">
+        select * from feedReply where fid = #{fid} order by regDate desc
+    </select>
+    <select id="getFidOfReplyCount" resultType="Long">
+        select count(*) from feedReply where fid = #{fid}
+    </select>
+    <select id="getFidOfHashTag" resultType="FeedHashTag">
+        select tagName from feedHashTag where fid = #{fid}
+    </select>
+    <select id="getFidofFeedRegDate" resultType="java.time.LocalDateTime">
+        select regDate from feed where fid = #{fid}
+    </select>
+    <select id="getFeedUserId" resultType="Long">
+        select userId from feed where fid = #{fid}
+    </select>
+    <delete id="deleteFeed">
+        delete from feed where fid = #{fid}
+    </delete>
+    <delete id="deleteFeedImg">
+        delete from feedImg where fid = #{fid}
+    </delete>
+    <delete id="deleteFeedHashTag">
+        delete from feedHashTag where fid = #{fid}
+    </delete>
+    <delete id="deleteFeedReply">
+        delete from feedReply where fid = #{fid}
+    </delete>
+    <delete id="deleteFidOfLikesCheck">
+        delete from likesCheck where fid = #{fid}
+    </delete>
+
+    <select id="getFeedByNewest" resultType="com.collectpop.domain.Feed">
+        SELECT * FROM feed
+        ORDER BY regDate desc
+    </select>
+</mapper>

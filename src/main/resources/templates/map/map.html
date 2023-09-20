@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en-US" dir="ltr" xmlns:th="http://www.thymeleaf.org">
+<!--Header 설정 -->
+<head th:replace="layout/header :: header"></head>
+<!--body-->
+<!-- 커스텀오버레이 style -->
+<style>
+    .wrap {position: absolute;left: 0;bottom: 40px;width: 288px;height: 132px;margin-left: -144px;text-align: left;overflow: hidden;font-size: 12px;font-family: 'Malgun Gothic', dotum, '돋움', sans-serif;line-height: 1.5;}
+    .wrap * {padding: 0;margin: 0;}
+    .wrap .info {width: 286px;height: 120px;border-radius: 5px;border-bottom: 2px solid #ccc;border-right: 1px solid #ccc;overflow: hidden;background: #fff;}
+    .wrap .info:nth-child(1) {border: 0;box-shadow: 0px 1px 2px #888;}
+    .info .title {padding: 5px 0 0 10px;height: 30px;background: #eee;border-bottom: 1px solid #ddd;font-size: 18px;font-weight: bold;}
+    .info .close {position: absolute;top: 10px;right: 10px;color: #888;width: 17px;height: 17px;background: url('https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/overlay_close.png');}
+    .info .close:hover {cursor: pointer;}
+    .info .body {position: relative;overflow: hidden;}
+    .info .desc {position: relative;margin: 13px 0 0 90px;height: 75px;}
+    .desc .ellipsis {overflow: hidden;text-overflow: ellipsis;white-space: nowrap;}
+    .desc .jibun {font-size: 11px;color: #888;margin-top: -2px;}
+    .info .img {position: absolute;top: 6px;left: 5px;width: 73px;height: 71px;border: 1px solid #ddd;color: #888;overflow: hidden;}
+    .info:after {content: '';position: absolute;margin-left: -12px;left: 50%;bottom: 0;width: 22px;height: 12px;background: url('https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/vertex_white.png')}
+    .info .link {color: #5085BB;}
+</style>
+<body data-spy="scroll" data-target=".onpage-navigation" data-offset="60">
+<!-- body쪽 header처럼 되어 있는 내용들 -->
+<th:block th:replace="layout/startContent :: startContent"></th:block>
+
+<!-- Main Content들어갈 부분 -->
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=919031db26e53a5834e1f3419bc1450d&libraries=services,clusterer"></script>
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
+
+<div class="card shadow mb-4">
+
+    <div class="card-header  py-3" style="margin-top: 100px; display: flex; margin-bottom: 20px; justify-content: space-evenly;"  >
+        <label th:for="address"> </label>
+        <input class="form-control-sm float-right" type="text" th:id="address" placeholder="주소" style="width: 25%;">
+        <button type="button" class="btn btn-sm btn-dark float-right"
+                th:onclick="execDaumPostcode()">주소 검색</button>
+    </div>
+    <!-- 지도 표시 영역 -->
+    <div class="my-3">
+        <div id="map" style="width: 90%; height: 800px; margin: 0 auto; margin-bottom: 100px;"></div>
+
+        <script th:inline="javascript">
+            //주소 검색하여 이동
+            function execDaumPostcode() {
+                new daum.Postcode({
+                    oncomplete: function(data) {
+                        var addr = data.address; // 최종 주소 변수
+                        // 주소 정보를 해당 필드에 넣는다.
+                        document.getElementById("address").value = addr;
+                        // 주소로 상세 정보를 검색
+                        geocoder.addressSearch(data.address, function(results, status) {
+                            // 정상적으로 검색이 완료됐으면
+                            if (status === daum.maps.services.Status.OK) {
+                                var result = results[0]; //첫번째 결과의 값을 활용
+                                // 해당 주소에 대한 좌표를 받아서
+                                var coords = new daum.maps.LatLng(result.y, result.x);
+                                // 지도를 옮긴다.
+                                map.setCenter(coords);
+                            }
+                        });
+                    }
+                }).open();
+            }
+
+            // 실행 시 지도 위치 변경
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var lat = position.coords.latitude,
+                        lon = position.coords.longitude;
+
+                    var locPosition = new kakao.maps.LatLng(lat, lon);
+                    console.log(lat, lon);
+                    map.setCenter(locPosition);
+                });
+            }
+
+            var map = new kakao.maps.Map(document.getElementById('map'), {
+                center: new kakao.maps.LatLng(37.566826, 126.9786567),
+                level: 5
+            });
+
+            var geocoder = new kakao.maps.services.Geocoder();
+            var clusterer = new kakao.maps.MarkerClusterer({
+                map: map,
+                averageCenter: true,
+                minLevel: 5
+            });
+            let popupStoreList = /*[[${popupStoreList}]]*/ [];
+            // 오버레이와 마커 생성 및 이벤트 설정
+            for (let i = 0; i < popupStoreList.length; i++) {
+                let position = {
+                    lat: popupStoreList[i].latitude,
+                    lng: popupStoreList[i].longitude,
+                    title: popupStoreList[i].name,
+                    address: popupStoreList[i].address,
+                    img: popupStoreList[i].thumbnail,
+                    psId: popupStoreList[i].psId
+                };
+                var marker = new kakao.maps.Marker({
+                    position: new kakao.maps.LatLng(position.lat, position.lng)
+                });
+                // 클로저를 생성하여 오버레이를 클릭하면 보여지도록 하는 함수
+                function makeClickListener(overlay) {
+                    return function () {
+                        if (openedOverlay) {
+                            openedOverlay.setMap(null);
+                        }
+                        overlay.setMap(map);
+                        openedOverlay = overlay;
+                    };
+                }
+
+                var openedOverlay; // 열린 오버레이를 저장하는 변수
+
+                // 커스텀 오버레이를 닫기 위해 호출되는 함수입니다
+                function closeOverlay(overlay) {
+                    overlay.setMap(null);
+                }
+
+                // 오버레이 생성 함수
+                function createOverlay(position, marker) {
+                    // imgUrl 생성
+                    var imgUrl = '/collectpop/store/thumbnail/' + position.img;  // 이미지 URL 가져오기
+                    console.log("imgURL : " + imgUrl);
+                    var content = '<div class="wrap">' +
+                        '    <div class="info">' +
+                        '        <div class="title">' +
+                        '            ' + position.title +
+                        '            <div class="close" onclick="closeOverlay(overlay)" title="닫기"></div>' +
+                        '        </div>' +
+                        '        <div class="body">' +
+                        '            <div class="img">' +
+                        '                <a href="/collectpop/store/storeDetail/' + position.psId  + '">' +
+                        '                <img src="' + imgUrl + '" width="73" height="70">\n' +
+                        '            </div>' +
+                        '            <div class="desc">' +
+                        '                <div class="ellipsis">' + position.address + '</div>' +
+                        '                <a href="https://map.kakao.com/link/to/' + position.address + ',' + position.lat + ',' + position.lng + '"' +
+                        '                style="color: blue;" target="_blank">길찾기</a></div>' +
+                        '            </div>' +
+                        '        </div>' +
+                        '    </div>' +
+                        '</div>';
+
+                    var overlay = new kakao.maps.CustomOverlay({
+                        content: content,
+                        map: null, // 초기에는 지도에 표시하지 않음
+                        position: new kakao.maps.LatLng(position.lat, position.lng)
+                    });
+
+                    // 마커를 클릭했을 때 오버레이를 표시하도록 설정
+                    kakao.maps.event.addListener(marker, 'click', function () {
+                        if (openedOverlay) {
+                            openedOverlay.setMap(null);
+                        }
+                        overlay.setMap(map);
+                        openedOverlay = overlay;
+                    });
+
+                    return overlay; // 생성한 오버레이 반환
+                }
+                // 오버레이 클릭 시 호출되는 함수
+                function closeOverlay() {
+                    if (openedOverlay) {
+                        openedOverlay.setMap(null);
+                        openedOverlay = null;
+                    }
+                }
+
+                // 오버레이를 저장하는 변수
+                var openedOverlay;
+                var marker = new kakao.maps.Marker({
+                    position: new kakao.maps.LatLng(position.lat, position.lng)
+                });
+                // 클로저를 사용하여 오버레이와 마커를 연결합니다
+                var overlay = createOverlay(position, marker);
+                clusterer.addMarker(marker); // 클러스터러에 마커 추가
+
+                // 클러스터러에 마커 추가
+                clusterer.addMarker(marker);
+            }
+        </script>
+    </div>
+</div>
+
+<!-- End Main Content -->
+
+<!-- Footer 붙히기 -->
+<th:block th:replace="layout/footer :: footer"></th:block>
+</body>
+</html>

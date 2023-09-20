@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en-US" dir="ltr"xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<!--Header 설정 -->
+<head th:replace="layout/header :: header"></head>
+
+<style>
+    .wrap {position: absolute;left: 0;bottom: 40px;width: 288px;height: 132px;margin-left: -144px;text-align: left;overflow: hidden;font-size: 12px;font-family: 'Malgun Gothic', dotum, '돋움', sans-serif;line-height: 1.5;}
+    .wrap * {padding: 0;margin: 0;}
+    .wrap .info {width: 286px;height: 120px;border-radius: 5px;border-bottom: 2px solid #ccc;border-right: 1px solid #ccc;overflow: hidden;background: #fff;}
+    .wrap .info:nth-child(1) {border: 0;box-shadow: 0px 1px 2px #888;}
+    .info .title {padding: 5px 0 0 10px;height: 30px;background: #eee;border-bottom: 1px solid #ddd;font-size: 18px;font-weight: bold;}
+    .info .close {position: absolute;top: 10px;right: 10px;color: #888;width: 17px;height: 17px;background: url('https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/overlay_close.png');}
+    .info .close:hover {cursor: pointer;}
+    .info .body {position: relative;overflow: hidden;}
+    .info .desc {position: relative;margin: 13px 0 0 90px;height: 75px;}
+    .desc .ellipsis {overflow: hidden;text-overflow: ellipsis;white-space: nowrap;}
+    .desc .jibun {font-size: 11px;color: #888;margin-top: -2px;}
+    .info .img {position: absolute;top: 6px;left: 5px;width: 73px;height: 71px;border: 1px solid #ddd;color: #888;overflow: hidden;}
+    .info:after {content: '';position: absolute;margin-left: -12px;left: 50%;bottom: 0;width: 22px;height: 12px;background: url('https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/vertex_white.png')}
+    .info .link {color: #5085BB;}
+
+    .card-container {
+        display: flex;
+        gap: 20px;
+        width: 80%;
+        margin: 0 auto;
+    }
+    .card-container1 {
+        display: flex;
+        gap: 20px;
+        width: 80%;
+        margin: 0 auto;
+    }
+
+    .card {
+        width: 100%;
+        max-width: 290px;
+        max-height: 350px; /* 최대 높이 조정 */
+        border: 1px solid #ccc;
+        padding: 10px;
+        box-sizing: border-box;
+    }
+
+    .card img {
+        width: 100%;
+        height: auto;
+    }
+
+    .main_exh_sub {
+        margin-top: 10px;
+        font-size: 14px;
+    }
+
+
+
+    /* div태그 css구역 */
+    .links-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .right-links {
+        display: flex;
+        gap: 10px; /* 각 링크 사이의 간격 설정 */
+    }
+    .container {
+        justify-content: center;
+        align-items: center;
+
+    }
+
+</style>
+
+<!--body-->
+<body data-spy="scroll" data-target=".onpage-navigation" data-offset="60">
+<!-- body쪽 header처럼 되어 있는 내용들 -->
+<th:block th:replace="layout/startContent :: startContent"></th:block>
+
+
+<!-- Main Content들어갈 부분 -->
+<!-- Main Content들어갈 부분 -->
+<div class="main">
+    <!--상단에 이미지 구역-->
+    <section class="module bg-dark-30 about-page-header" data-background="/assets/images/about_bg.jpg">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-6 col-sm-offset-3">
+                    <h1 class="module-title font-alt mb-0">로그인 홈</h1>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!--상단 이미지 구역 끝-->
+
+    <!--로그인 했을때 안했을때 보여주는 버튼 -->
+    <!--    <button sec:autorize="isAuthenticated()">로그인</button>-->
+    <!--    <button sec:autorize="isAnonymous()">로그인X</button>-->
+
+    <div class="container">
+        <div class="row">
+            <hr class="divider-w mb-10">
+            <h1> 로그인 홈 </h1>
+            <h4 th:text="|${users.nickname} 님 환영합니다.|"></h4>
+
+            <!--start popupstore -->
+            <div class="form-group">
+                <a th:href="@{/collectpop/store/addStore}">스토어 작성</a>
+            </div>
+            <div class="form-group">
+                <a th:href="@{/collectpop/store/storeList}">스토어 목록</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=919031db26e53a5834e1f3419bc1450d&libraries=services,clusterer"></script>
+        <br /><br />
+        <div class="">
+            <label>                 내 주변 팝업 스토어 위치</label>
+        </div><br /><br />
+        <div class="my-3">
+            <div id="map" style="width: 80%; height: 400px; margin: 0 auto;"></div>
+
+            <script th:inline="javascript">
+                var map = new kakao.maps.Map(document.getElementById('map'), {
+                    center: new kakao.maps.LatLng(37.566826, 126.9786567), // Initial center, you can update it later
+                    level: 5
+                });
+
+                var clusterer = new kakao.maps.MarkerClusterer({
+                    map: map,
+                    averageCenter: true,
+                    minLevel: 5
+                });
+
+                var openedOverlay; // 열린 오버레이를 저장하는 변수
+
+                // 커스텀 오버레이를 닫기 위해 호출되는 함수입니다
+                function closeOverlay(overlay) {
+                    overlay.setMap(null);
+                }
+
+                // 커스텀 오버레이 생성 함수
+                function createOverlay(position, marker) {
+                    var content = '<div class="wrap">' +
+                        '    <div class="info">' +
+                        '        <div class="title">' +
+                        '            ' + position.title +
+                        '            <div class="close" onclick="closeOverlay(overlay)" title="닫기"></div>' +
+                        '        </div>' +
+                        '        <div class="body">' +
+                        '            <div class="img">' +
+                        '                <img src="' + position.img + '" width="73" height="70">' +
+                        '           </div>' +
+                        '            <div class="desc">' +
+                        '                <div class="ellipsis">' + position.address + '</div>' +
+                        '                <a href="https://map.kakao.com/link/to/' + position.address + ',' + position.lat + ',' + position.lng + '"' +
+                        '                style="color: blue;" target="_blank">길찾기</a></div>' +
+                        '            </div>' +
+                        '        </div>' +
+                        '    </div>' +
+                        '</div>';
+
+                    var overlay = new kakao.maps.CustomOverlay({
+                        content: content,
+                        map: null, // 초기에는 지도에 표시하지 않음
+                        position: new kakao.maps.LatLng(position.lat, position.lng)
+                    });
+
+                    // 마커를 클릭했을 때 커스텀 오버레이를 표시합니다
+                    kakao.maps.event.addListener(marker, 'click', function () {
+                        if (openedOverlay) {
+                            openedOverlay.setMap(null);
+                        }
+                        overlay.setMap(map);
+                        openedOverlay = overlay;
+                    });
+
+                    return overlay; // Return the created overlay
+                }
+
+                function fetchNearbyStores(lat, lng) {
+                    // Simulated example data, replace with actual store data retrieval
+                    let popupStoreList = [
+                    ];
+
+                    let positions = [];
+                    for (let i = 0; i < popupStoreList.length; i++) {
+                        var store = popupStoreList[i];
+                        var position = {
+                            lat: store.latitude,
+                            lng: store.longitude,
+                            title: store.name,
+                            content: store.content,
+                            address: store.address,
+                            img: store.thumbnail,
+                            startDate :store.startDate,
+                            endDate: store.endDate
+                        };
+                        positions.push(position);
+
+                        // Create markers and overlays
+                        var marker = new kakao.maps.Marker({
+                            position: new kakao.maps.LatLng(position.lat, position.lng),
+                            map: map
+                        });
+
+                        var overlay = createOverlay(position, marker);
+                        clusterer.addMarker(marker);
+
+                        // Add click event to markers
+                        kakao.maps.event.addListener(marker, 'click', function () {
+                            if (openedOverlay) {
+                                openedOverlay.setMap(null);
+                            }
+                            overlay.setMap(map);
+                            openedOverlay = overlay;
+                        });
+                    }
+                }
+
+                function currentLocation() {
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(function(position) {
+                            var latitude = position.coords.latitude;
+                            var longitude = position.coords.longitude;
+
+                            // Update map center to user's location
+                            map.setCenter(new kakao.maps.LatLng(latitude, longitude));
+
+                            // Fetch and display nearby store information
+                            fetchNearbyStores(latitude, longitude);
+
+                            // Place a marker at the user's current location
+                            var userMarker = new kakao.maps.Marker({
+                                position: new kakao.maps.LatLng(latitude, longitude),
+                                map: map
+                            });
+                        });
+                    } else {
+                        console.log("Geolocation is not supported by this browser.");
+                    }
+                }
+
+                currentLocation();
+            </script>
+
+            <script th:inline="javascript">
+                let popupStoreHashtagList = /*[[${popupStoreHashtagList}]]*/ [];
+
+
+                let position = [];
+                for (let i = 0; i < popupStoreHashtagList.length; i++) {
+                    let hashtag = popupStoreHashtagList[i];
+                    let position = {
+                        hashtag: popupStoreHashtagList[i].hashtag
+                    };
+                    position.push(position);
+                }
+                console.log("hashtag : " +   );
+
+
+                let currentPage = 0;
+                let cardsPerPage = 4;
+
+                function displayRecommendCards(page) {
+                    var cardContainer = document.getElementById("recommendCardContainer");
+                    cardContainer.innerHTML = "";
+
+                    var startIndex = page * cardsPerPage;
+                    var endIndex = startIndex + cardsPerPage;
+
+                    for (var i = startIndex; i < endIndex && i < popupStoreList.length; i++) {
+                        var store = popupStoreList[i];
+                        var card = '<div class="card">' +
+                            '<img src="' + store.thumbnail + '" alt="Store Image">' +
+                            '<div class="main_exh_sub">' +
+                            '    <span>' + store.name + '</span><br/>' +
+                            '    <span>' + store.address + '</span><br/>' +
+                            '    <span>' + store.startDate + ' ~ ' + store.endDate + '</span>' +
+                            '    <div class="hashtags">';
+
+                        for (var j = 0; j < hashTagList.length; j++) {
+                            card += '<span>' + hashTagList[j].hashtag + '</span>';
+                        }
+
+                        card += '</div></div></div>';
+                        cardContainer.innerHTML += card;
+                    }
+                }
+
+                // Initial display
+                displayRecommendCards(currentPage);
+
+                let recommendNextButton = document.getElementById("recommendNextButton");
+                recommendNextButton.addEventListener("click", function () {
+                    currentPage++;
+                    displayRecommendCards(currentPage);
+                });
+
+                let recentNextButton = document.getElementById("recentNextButton");
+                recentNextButton.addEventListener("click", function () {
+                    currentPage++;
+                    displayRecentCards(currentPage);
+                });
+            </script>
+
+        </div><br /><br />
+        <div>
+            <label>         이달 추천 팝업 스토어</label>
+        </div>
+        <div class="card-container" id="recommendCardContainer">
+            <div class="card" th:each="store : ${popupStoreList}">
+                <img th:src="${store.thumbnail}" alt="Store Image">
+                <div class="main_exh_sub">
+                    <span th:text="${store.name}"></span><br/>
+                    <span th:text="${store.address}"></span><br/>
+                    <span th:text="${store.startDate} + ' ~ ' + ${store.endDate}"></span>
+                    <div>
+                        <span th:each="hashtag : ${hashtag}" th:text="${hashtag.hashtag}"></span>
+                    </div>
+                </div>
+            </div>
+            <button id="recommendNextButton">Next</button>
+        </div>
+
+        <div>
+            <label>             최근 올라온 팝업 스토어</label>
+        </div><br /><br />
+        <div class="card-container" id="recentCardContainer">
+            <!-- Each store card with Thymeleaf expression -->
+            <div class="card" th:each="store : ${popupStoreList}">
+                <img th:src="${store.thumbnail}" alt="Store Image">
+                <div class="main_exh_sub">
+                    <span th:text="${store.name}"></span><br/>
+                    <span th:text="${store.address}"></span><br/>
+                    <span th:text="${store.startDate} + ' ~ ' + ${store.endDate}"></span>
+                    <div>
+                        <span th:each="hashtag : ${hashtag}" th:text="${hashtag.hashtag}"></span>
+                    </div>
+                </div>
+            </div>
+            <button id="recentNextButton">Next</button>
+        </div>
+        <br/> <br/>
+        <!--end popupstore -->
+
+    </div>
+
+
+
+
+
+<!-- End Main Content -->
+
+</div>
+<!-- Footer 붙히기 -->
+<th:block th:replace="layout/footer :: footer"></th:block>
+</body>
+</html>

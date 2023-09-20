@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.collectpop.repository.BannerMapper">
+
+    <insert id="insertBanner" parameterType="com.collectpop.domain.Banner">
+    INSERT INTO banner (bnId, file_name, file_path)
+    VALUES (banner_seq.nextVal, #{file_name}, #{file_path})
+    </insert>
+
+    <delete id="deleteBanner">
+        DELETE FROM banner
+        WHERE bnId = #{bnId}
+    </delete>
+
+    <select id="getBanner" resultType="Banner">
+        select * from banner
+    </select>
+
+    <select id="getBannerById" parameterType="com.collectpop.domain.Banner">
+        select bnId from banner
+    </select>
+</mapper>

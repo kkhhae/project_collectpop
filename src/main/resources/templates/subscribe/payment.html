@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http:www.thymeleaf.org">
+
+<head th:replace="layout/header :: header"></head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>결제하기 버튼</title>
+<!-- 포트원 결제 -->
+<script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+<!-- jQuery -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+<!-- iamport.payment.js -->
+<script type="text/javascript" src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js"></script>
+<!-- 포트원 결제 -->
+
+<body data-spy="scroll" data-target=".onpage-navigation" data-offset="60">
+
+<th:block th:replace="layout/startContent :: startContent"></th:block>
+
+<div class="main">
+    <div class="main">
+        <section class="module">
+            <h1 style="text-align: center; font-weight: 900; line-height: 120%;" >COLLECTPOP 구독권 신청</h1>
+            <div class="container px-4 py-5" style="width: 70%; ">
+
+            </div>
+
+            <br>
+            <hr class="divider-w mb-10">
+            <ul>
+                <li>COLLETPOP 구독은 새로 오픈한 팝업스토어를 확인할수 있습니다.</li>
+                <br/>
+                <li>1000원으로 쉽게 확인하세요!</li>
+
+            </ul>
+        </section>
+
+        <hr class="divider-w mb-10">
+        <button id="payment" style="border: none;  background: none;  outline: none; text-align: center;  display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100px;"> <img src="/assets/payment/kakao.png">
+        </button>
+
+        <!--프로필 쪽 끝-->
+    </div>
+
+
+
+    <script th:inline="javascript">
+        // 구매자 정보
+        let userEmail = /*[[${users.email}]]*/'';
+        let username = /*[[${users.username}]]*/'';
+        // 결제창 함수 넣어주기
+        const buyButton = document.getElementById('payment');
+        buyButton.addEventListener('click', function() {
+            kakaoPay(userEmail, username);
+        });
+
+        var IMP = window.IMP;
+
+        var today = new Date();
+        var hours = today.getHours(); // 시
+        var minutes = today.getMinutes(); // 분
+        var seconds = today.getSeconds(); // 초
+        var milliseconds = today.getMilliseconds();
+        var makeMerchantUid = `${hours}${minutes}${seconds}${milliseconds}`;
+
+        function kakaoPay(userEmail, username) {
+            if (confirm("구매 하시겠습니까?")) { // 구매 클릭시 한번 더 확인하기
+                IMP.init("imp04758158"); // 여기에 가맹점 식별코드를 넣어주세요
+                IMP.request_pay({
+                    pg: 'kakaopay.TC0ONETIME', // PG사 코드표에서 선택
+                    pay_method: 'card', // 결제 방식
+                    merchant_uid: "IMP" + makeMerchantUid, // 결제 고유 번호
+                    name: 'COLLECTPOP 정기 구독권', // 제품명
+                    amount: '1000', // 가격
+                    // 구매자 정보 ↓
+                    buyer_email: userEmail,
+                    buyer_name: username,
+                }, async function (rsp) { // callback
+                    if (rsp.success) {
+                        console.log(rsp);
+
+                        const paymentData = {
+                            merchantUid: rsp.merchant_uid,
+                            productName: rsp.name,
+                            amount: 1000,
+                            buyerEmail: rsp.buyer_email,
+                            buyerName: rsp.buyer_name,
+                            paymentStatus: rsp.status,
+                            paymentDateTime: new Date(rsp.paid_at),
+                        };
+
+                        // Send the payment data to your backend for saving
+                        try {
+                            const response = await fetch('processPayment', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify(paymentData),
+                            });
+
+                            if (response.ok) {
+                                alert('결제 완료!');
+                                window.location.href = "/collectpop";
+                            } else {
+                                alert('결제 정보 저장 실패');
+                            }
+                        } catch (error) {
+                            console.error('결제 정보 전송 실패:', error);
+                            alert('결제 실패');
+                        }
+                    } else {
+                        alert(rsp.error_msg);
+                    }
+                });
+            } else {
+                return false;
+            }
+        }
+    </script>
+
+
+    <th:block th:replace="layout/footer :: footer"></th:block>
+
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en-US" dir="ltr" xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="sidebar">
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href= "/assets/css/sidebar.css">
+
+    <style>
+
+    </style>
+</head>
+<body id="body-pd">
+    <div class="l-navbar" id="navbar" >
+        <nav class="nav">
+            <div>
+                <div class="nav__list">
+                    <div class="nav__brand" style=" align-items: center;">
+                        <ion-icon name="menu-outline" class="nav__toggle" id="nav-toggle"></ion-icon>
+                        <a href="#" class="nav__logo"></a>
+                    </div>
+
+                    <a th:href="@{/collectpop/users/edit/{id}(id=${users.userId})}" class="nav__link active">
+                        <ion-icon name="person-circle"  class="nav__icon"></ion-icon>
+                        <span class="nav_name">  회원정보 수정</span>
+                    </a>
+
+                    <a class="nav__link" th:href="@{/collectpop/store/request}">
+                        <ion-icon name="add"  class="nav__icon"></ion-icon>
+                        <span class="nav_name">  스토어매니저 신청</span>
+                    </a>
+
+                    <a th:href="@{/collectpop/users/myList/{id}(id=${users.userId})}" class="nav__link ">
+                        <ion-icon name="file-tray-full"  class="nav__icon"></ion-icon>
+                        <span class="nav_name"> 스토어매니저 결과</span>
+
+                    </a>
+
+                    <a th:href="@{/collectpop/store/addStore}"  class="nav__link">
+                        <ion-icon name="construct"  class="nav__icon"></ion-icon>
+                        <span class="nav_name"> 스토어 추가</span>
+                    </a>
+
+                    <a th:href="@{/collectpop/users/myStore}" class="nav__link">
+                        <ion-icon name="storefront" class="nav__icon"></ion-icon>
+                        <span class="nav_name">  내가 올린 스토어</span>
+                    </a>
+                </div>
+<!--                <a th:href="@{/logout}" class="nav__link">-->
+<!--                    <ion-icon name="log-out" class="nav__icon"></ion-icon>-->
+<!--                    <span class="nav_name"> 로그아웃 </span>-->
+<!--                </a>-->
+            </div>
+        </nav>
+    </div>
+
+
+<!--    &lt;!&ndash;드롭다운쓰고싶으면 사용&ndash;&gt; -->
+<!--        <div href="#" class="nav__link collapse">-->
+<!--            <ion-icon name="people-outline" class="nav__icon"></ion-icon>-->
+<!--            <span class="nav_name">  내가 좋아요한 스토어</span>-->
+<!--                <ul class="collapse__menu">-->
+<!--                    <a href="#" class="collapse__sublink">Data</a>-->
+<!--                    <a href="#" class="collapse__sublink">Group</a>-->
+<!--                    <a href="#" class="collapse__sublink">Members</a>-->
+<!--    -->
+<!--                </ul>-->
+<!--            <ion-icon name="chevron-down-outline" class="collapse__link"></ion-icon>-->
+<!--        </div>-->
+
+
+    <!-- IONICONS -->
+    <script src="https://unpkg.com/ionicons@5.2.3/dist/ionicons.js"></script>
+    <!-- JS -->
+    <script src="/assets/js/sidebar.js"></script>
+
+</body>
+
+</th:block>
+
+</html>

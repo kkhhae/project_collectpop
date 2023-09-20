@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en-US" dir="ltr" xmlns:th="http://www.thymeleaf.org">
+
+<!--Header 설정 -->
+<head th:replace="layout/header :: header"></head>
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script type="text/javascript"
+        src="//dapi.kakao.com/v2/maps/sdk.js?appkey=919031db26e53a5834e1f3419bc1450d&libraries=services"></script>
+<!--body-->
+<body data-spy="scroll" data-target=".onpage-navigation" data-offset="60">
+<!-- body쪽 header처럼 되어 있는 내용들 -->
+<th:block th:replace="layout/startContent :: startContent"></th:block>
+
+<!-- Main Content들어갈 부분 -->
+<!-- 이미지 미리보기 및 썸네일 표시를 위한 스타일 추가 -->
+<style>
+  .document-preview {
+    max-width: 200px;
+    max-height: 200px;
+    margin-top: 10px;
+  }
+</style>
+
+<section class="module bg-dark-30 about-page-header" data-background="assets/images/about_bg.jpg">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-6 col-sm-offset-3">
+        <h1 class="module-title font-alt mb-0">팝업스토어 등록 권한신청</h1>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- 등업신청 폼 -->
+<section class="module">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-8 col-md-offset-2">
+        <h4 class="module-title font-alt"> 안내사항</h4>
+        <ul>
+          <li>신청 페이지 하단의 모든 내역은 필수적으로 기입부탁드립니다.</li>
+          <li>회원가입 후 팝업스토어 등록 신청 시 아래의 사항을 기재하여 주시면, 빠른 시간 내에 회원등급을 조정해드리겠습니다.</li>
+          <li>사업자등록증을 보유하시지 않은 경우, 권한 조정이 불가합니다.</li>
+          <li>본인의 사업자등록증이 아닐 경우 법적조치가 이루어질 수 있습니다.</li>
+          <li>신청사항 확인까지 영업일 기준 3~4일이 소요됩니다.</li>
+          <li>구체적인 반려사유, 빠른진행등을 원하시는 경우 고객센터로 연락 부탁드립니다. </li>
+          CALL : 12-123-1234 <br>
+          운영시간 : 평일 09:30-18:30 | 주말·공휴일 제외<br>
+          점심시간 : 평일 11:40-13:00
+        </ul>
+        <form action="request" method="post" enctype="multipart/form-data" onsubmit="return submitForm(event)">
+          <div class="form-group">
+            <label for="companyname">회사명(업체명)</label>
+            <input type="text" id="companyname" name="companyname" class="form-control" required placeholder="필수기입사항">
+          </div>
+          <div class="form-group">
+            <label for="bossname">대표자명</label>
+            <input type="text" id="bossname" name="bossname" class="form-control" required placeholder="필수기입사항">
+          </div>
+          <div class="form-group">
+            <label for="content">신청내용</label>
+            <textarea id="content" name="content" class="form-control"  th:rows="6" th:cols="60"  required
+                      maxlength="1400" oninput="updateTextareaLength(this)" placeholder="필수기입사항 / 최대 1400자까지 작성가능합니다."></textarea>
+            <small class="text-muted" id="textareaLengthInfo">0/1400자 작성</small>
+          </div>
+
+          <span class="info-label">[작성 가이드라인]</span>
+          <p>아래의 항목들을 정확히 작성하여 주시기 바랍니다. 각 항목은 신청처리에 필요한 정보입니다.</p>
+
+          <ul class="application-guidelines">
+            <li>
+              <strong>1.간략한 업체 소개:</strong> 회사 또는 업체에 대한 간략한 소개를 적어주세요.
+            </li>
+            <li>
+              <strong>2.콜렉트팝을 알게된 경로:</strong> 어떤 경로로 콜렉트팝을 알게 되었는지 작성해주세요.
+            </li>
+            <li>
+              <strong>3.회사와 신청자와의 관계:</strong> 만약 본인이 대표이신 경우, 본인 성함을 기재해주세요.
+            </li>
+            <li>
+              <strong>4.앞으로 사이트에 어떤 팝업스토어를 올릴 계획인지?:</strong> 예정된 팝업스토어에 대한 간단한 계획을 작성해주세요.
+            </li>
+            <li>
+              <strong>5.스토어 주요 고객층(타겟):</strong> 스토어의 주요 고객층 또는 타겟을 작성해주세요.
+            </li>
+            <li>
+              <strong>6.기타 관리자 확인 시 참고할 사항:</strong> 추가로 전달할 사항이 있으면 작성해주세요.
+            </li>
+          </ul>
+          <p>위의 정보를 정확하게 입력하여 주시면 빠른 처리를 도와드리겠습니다.</p>
+
+
+
+          <div class="form-group">
+            <label for="businessregistrationnumber">사업자등록번호</label>
+            <input type="text" id="businessregistrationnumber" name="businessregistrationnumber" class="form-control" required placeholder="숫자만 입력해주세요."
+                   maxlength="12" oninput="addHyphenToNumberField(this)">
+            <small class="text-muted" id="businessRegistrationInfo"></small>
+          </div>
+          <div class="form-group">
+            <label for="contactnumber">신청자 연락처</label>
+            <input type="text" id="contactnumber" name="contactnumber" class="form-control" required placeholder="숫자만입력 혹은 숫자와 하이픈(-)만 입력해주세요"
+                   maxlength="14" oninput="validateContactNumber(this)">
+            <small class="text-muted" id="contactNumberInfo"></small>
+          </div>
+
+          <div class="form-group">
+            <label for="document1">증빙서류 첨부1 (첨부 가능한 확장자 : .pdf, .jpg, .png, .gif, .docx)</label>
+            <input type="file" id="document1" name="documentFile1" class="form-control-file" accept=".pdf, .jpg, .png, .gif, .docx" onchange="previewDocument('document1', 'document1Preview')">
+            <div id="document1Preview"></div>
+          </div>
+          <div class="form-group">
+            <label for="document2">증빙서류 첨부2 (첨부 가능한 확장자 : .pdf, .jpg, .png, .gif, .docx)</label>
+            <input type="file" id="document2" name="documentFile2" class="form-control-file" accept=".pdf, .jpg, .png, .gif, .docx" onchange="previewDocument('document2', 'document2Preview')">
+            <div id="document2Preview"></div>
+          </div>
+          <div class="form-group">
+            <label for="document3">증빙서류 첨부3 (첨부 가능한 확장자 : .pdf, .jpg, .png, .gif, .docx)</label>
+            <input type="file" id="document3" name="documentFile3" class="form-control-file" accept=".pdf, .jpg, .png, .gif, .docx" onchange="previewDocument('document3', 'document3Preview')">
+            <div id="document3Preview"></div>
+          </div>
+
+          <!-- 신청시 유저고유번호 히든으로 넘김 -->
+          <input type="hidden" id="userId" name="userId" th:value="${users.userId}" />
+
+          <button type="submit" class="btn btn-default">신청하기</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 이미지 미리보기 -->
+<script th:inline="javascript">
+  function previewDocument(inputId, previewId) {
+    var input = document.getElementById(inputId);
+    var preview = document.getElementById(previewId);
+
+    // 기존 미리보기를 삭제하고 새로운 미리보기 생성
+    preview.innerHTML = "";
+
+    if (input.files && input.files[0]) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var image = document.createElement("img");
+        image.className = "document-preview";
+        image.alt = "증빙서류 미리보기";
+        image.src = e.target.result;
+        preview.appendChild(image);
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+</script>
+
+<!-- 글자 작성수 확인 -->
+<script th:inline="javascript">
+  function updateTextareaLength(textarea) {
+    var length = textarea.value.length;
+    var maxLength = textarea.getAttribute("maxlength");
+    var lengthInfo = document.getElementById("textareaLengthInfo");
+    lengthInfo.innerText = length + "/" + maxLength + "자 작성";
+
+    if (length > maxLength) {
+      lengthInfo.style.color = "red";
+    } else {
+      lengthInfo.style.color = "";
+    }
+  }
+</script>
+
+
+<script th:inline="javascript">
+  function addHyphenToNumberField(inputElement) {
+    // 입력된 값을 가져옵니다.
+    let value = inputElement.value;
+
+    // 모든 공백 및 하이픈을 제거합니다.
+    value = value.replace(/\s|-/g, '');
+
+    // 숫자만 입력되도록 검사
+    if (/^\d*$/.test(value)) {
+      // 사업자 등록번호의 경우 3-2-5 형식으로 하이픈을 삽입
+      if (value.length === 10) {
+        value = value.substr(0, 3) + '-' + value.substr(3, 2) + '-' + value.substr(5, 5);
+      }
+
+      // 입력 필드에 값을 설정
+      inputElement.value = value;
+
+      // 숫자 10자리 입력 시 이후 입력을 제한하고 알림 메시지를 빨간색으로 표시
+      if (value.length > 12) {
+        document.getElementById("businessRegistrationInfo").innerText = "최대 10자리까지 입력 가능합니다.";
+        document.getElementById("businessRegistrationInfo").style.color = "red";
+        inputElement.value = value.substr(0, 12);
+      } else {
+        // 안내 문구를 초기화하고 색상을 원래대로 설정
+        document.getElementById("businessRegistrationInfo").innerText = "";
+        document.getElementById("businessRegistrationInfo").style.color = "";
+      }
+    } else {
+      // 숫자가 아닌 문자가 입력된 경우 안내 문구를 설정하고 색상을 빨간색으로 설정
+      document.getElementById("businessRegistrationInfo").innerText = "숫자만 입력해주세요.";
+      document.getElementById("businessRegistrationInfo").style.color = "red";
+    }
+  }
+</script>
+
+<script th:inline="javascript">
+  function validateContactNumber(input) {
+    var contactNumber = input.value;
+    var contactNumberInfo = document.getElementById("contactNumberInfo");
+
+    // 입력된 값에서 공백을 제외한 문자열 추출
+    var extractedNumber = contactNumber.replace(/\s/g, "");
+
+    if (extractedNumber.length > 13) {
+      contactNumberInfo.innerText = "연락처가 너무 깁니다. 올바른 형식인지 확인해주세요.";
+      contactNumberInfo.style.color = "red";
+    } else if (/[^0-9-]/.test(extractedNumber)) {
+      contactNumberInfo.innerText = "숫자와 하이픈(-)만 입력해주세요.";
+      contactNumberInfo.style.color = "red";
+    } else {
+      contactNumberInfo.innerText = "";
+    }
+  }
+</script>
+<!-- 파일첨부 유효성 검사 -->
+<script th:inline="javascript">
+  function submitForm(event) {
+    // 파일 첨부 필드 가져오기
+    var document1Input = document.getElementById("document1");
+    var document2Input = document.getElementById("document2");
+    var document3Input = document.getElementById("document3");
+
+    // 각 파일 첨부 필드의 값 확인
+    var document1Value = document1Input.files[0];
+    var document2Value = document2Input.files[0];
+    var document3Value = document3Input.files[0];
+
+    // 값이 없을 경우 기본값 설정
+    var document1Value = document1Input.files[0] ? document1Input.files[0] : " ";
+    var document2Value = document2Input.files[0] ? document2Input.files[0] : " ";
+    var document3Value = document3Input.files[0] ? document3Input.files[0] : " ";
+
+    // 각 파일 첨부 필드의 값을 설정
+    document1Input.value = document1Value;
+    document2Input.value = document2Value;
+    document3Input.value = document3Value;
+
+    // 폼 제출
+    return true;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- End Main Content -->
+
+<!-- Footer 붙히기 -->
+<th:block th:replace="layout/footer :: footer"></th:block>
+</body>
+</html>

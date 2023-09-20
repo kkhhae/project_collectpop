@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en-US" dir="ltr" xmlns:th="http://www.thymeleaf.org">
+
+<!--Header 설정 -->
+<head th:replace="layout/header :: header"></head>
+
+<!--body-->
+<body data-spy="scroll" data-target=".onpage-navigation" data-offset="60">
+<!-- body쪽 header처럼 되어 있는 내용들 -->
+<th:block th:replace="layout/startContent :: startContent"></th:block>
+
+<!-- Main Content들어갈 부분 -->
+
+<section class="module bg-dark-30 about-page-header" data-background="assets/images/about_bg.jpg">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-6 col-sm-offset-3">
+                <h1 class="module-title font-alt mb-0"> 등업신청 상세페이지 </h1>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 등업신청 상세내역 -->
+<section class="module">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <table class="table">
+                    <tbody>
+                    <tr>
+                        <th>신청번호</th>
+                        <td th:text="${storeRequest.requestId}"></td>
+
+                    </tr>
+                    <tr>
+                        <th>회사명</th>
+                        <td th:text="${storeRequest.companyname}"></td>
+                    </tr>
+                    <tr>
+                        <th>대표자명</th>
+                        <td th:text="${storeRequest.bossname}"></td>
+                    </tr>
+                    <tr>
+                        <th>사업자등록번호</th>
+                        <td th:text="${storeRequest.businessregistrationnumber}"></td>
+                    </tr>
+                    <tr>
+                        <th>신청내용</th>
+                        <td th:text="${storeRequest.content}"></td>
+                    </tr>
+                    <tr>
+                        <th>신청자 연락처</th>
+                        <td th:text="${storeRequest.contactnumber}"></td>
+                    </tr>
+                    <tr>
+                        <th>증빙서류 첨부1</th>
+                        <td colspan="3">
+                            <a th:if="${storeRequest.document1 != null}"
+                               th:href="@{/collectpop/admin/download/{fileName}(fileName=${storeRequest.document1})}">
+                                첨부파일 다운로드: <span th:text="${storeRequest.document1}"></span>
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>증빙서류 첨부2</th>
+                        <td colspan="3">
+                            <a th:if="${storeRequest.document2 != null}"
+                               th:href="@{/collectpop/admin/download/{fileName}(fileName=${storeRequest.document2})}">
+                                첨부파일 다운로드: <span th:text="${storeRequest.document2}"></span>
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>증빙서류 첨부3</th>
+                        <td colspan="3">
+                            <a th:if="${storeRequest.document3 != null}"
+                               th:href="@{/collectpop/admin/download/{fileName}(fileName=${storeRequest.document3})}">
+                                첨부파일 다운로드: <span th:text="${storeRequest.document3}"></span>
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>신청시간</th>
+                        <td th:text="${storeRequest.requestReg}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+                <a href="/collectpop/admin/requestList"  class="btn btn-default">신청 목록으로 돌아가기</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+
+
+
+<!-- End Main Content -->
+
+<!-- Footer 붙히기 -->
+<th:block th:replace="layout/footer :: footer"></th:block>
+</body>
+</html>

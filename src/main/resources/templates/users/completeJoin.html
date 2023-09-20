@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en-US" dir="ltr"xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<!--Header 설정 -->
+<head th:replace="layout/header :: header"></head>
+
+<!--body-->
+<body data-spy="scroll" data-target=".onpage-navigation" data-offset="60">
+<!-- body쪽 header처럼 되어 있는 내용들 -->
+<th:block th:replace="layout/startContent :: startContent"></th:block>
+<!-- Main Content들어갈 부분 -->
+<script th:inline="javascript">
+    /*<![CDATA[*/
+        alert("회원가입을 환영합니다! 로그인을 진행해주세요");
+<!--        location.href=history.go(-1);-->
+        location.href = "/collectpop/users/login";
+    /*]]>*/
+</script>
+
+
+<!-- End Main Content -->
+
+<!-- Footer 붙히기 -->
+<th:block th:replace="layout/footer :: footer"></th:block>
+</body>
+
+<!--<script th:inline="javascript">-->
+<!--    /*<![CDATA[*/-->
+<!--        alert("가입이 완료되었습니다!!!");-->
+<!--        window.location='/collectpop/';-->
+<!--    /*]]>*/-->
+<!--</script>-->
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="layout/header :: header"></head>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.10/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.10/dist/sweetalert2.min.js"></script>
+<link th:href="@{/assets/css/style-admin-declaration.css}" rel="stylesheet" type="text/css">
+<body data-spy="scroll" data-target=".onpage-navigation" data-offset="60">
+    <nav class="navbar navbar-custom navbar-fixed-top clearfix" role="navigation">
+        <div class="container">
+
+            <!--좌측 로고 -->
+            <div class="navbar-header">
+                <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#custom-collapse"><span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span>
+                    <span class="icon-bar"></span></button><a class="navbar-brand" th:href="@{/collectpop/admin/mainm}">COLLECTPOPS<span class="logomin">admin</span></a>
+            </div>
+
+            <!-- 우측 헤더 목록-->
+            <div class="collapse navbar-collapse" id="custom-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li class=""><a class="" th:href="@{/collectpop/admin/mainm}" >HOME</a> </li>
+                    <li class=""><a class="" href="#" >POPUPSTORE</a></li>
+                    <li class=""><a class="" href="#" >USERS</a></li>
+                    <li class=""><a class="" th:href="@{/collectpop/admin/declaration}" >DECLARATION</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section id="declaration-section-wrap" class="container">
+        <table class="table shadow-shorter">
+            <thead>
+            <tr>
+                <th scope="col" class="align-center">#</th>
+                <th scope="col" class="align-center">신고 예시 내용</th>
+                <th scope="col" class="align-center">관리</th>
+            </tr>
+            </thead>
+            <tbody id="printMe">
+
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3" class="text-center"><button type="button" class="btn-primary plusBtn" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo"><i class="bi bi-plus"></i>추가하기</button></td>
+                </tr>
+            </tfoot>
+        </table>
+
+    </section>
+
+    <script src="/assets/lib/jquery/dist/jquery.js"></script>
+    <script src="/assets/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="/assets/lib/wow/dist/wow.js"></script>
+    <script src="/assets/lib/jquery.mb.ytplayer/dist/jquery.mb.YTPlayer.js"></script>
+    <script src="/assets/lib/isotope/dist/isotope.pkgd.js"></script>
+    <script src="/assets/lib/imagesloaded/imagesloaded.pkgd.js"></script>
+    <script src="/assets/lib/flexslider/jquery.flexslider.js"></script>
+    <script src="/assets/lib/owl.carousel/dist/owl.carousel.min.js"></script>
+    <script src="/assets/lib/smoothscroll.js"></script>
+    <script src="/assets/js/decmanaged.js"></script>
+    <script src="/assets/lib/magnific-popup/dist/jquery.magnific-popup.js"></script>
+    <script src="/assets/lib/simple-text-rotator/jquery.simple-text-rotator.min.js"></script>
+    <script src="/assets/js/plugins.js"></script>
+    <script src="/assets/js/main.js"></script>
+</body>
+</html>

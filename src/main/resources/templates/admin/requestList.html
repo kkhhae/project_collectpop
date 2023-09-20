@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en-US" dir="ltr" xmlns:th="http://www.thymeleaf.org">
+
+<!--Header 설정 -->
+<head th:replace="layout/header :: header"></head>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!--body-->
+<body data-spy="scroll" data-target=".onpage-navigation" data-offset="60">
+<!-- body쪽 header처럼 되어 있는 내용들 -->
+<th:block th:replace="layout/startContent :: startContent"></th:block>
+
+<!-- Main Content들어갈 부분 -->
+
+<section class="module bg-dark-30 about-page-header" data-background="assets/images/about_bg.jpg">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-6 col-sm-offset-3">
+                <h1 class="module-title font-alt mb-0">팝업스토어 관리 페이지</h1>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+    <h2>등업신청 리스트</h2>
+
+    <div class="sort-container">
+        <p>정렬 유형</p>
+        <select id="sort-selector">
+            <option value="newest">최신순</option>
+            <option value="oldest">오래된순</option>
+        </select>
+    </div>
+
+    <table class="table" id="request-list">
+        <thead>
+        <tr>
+            <th style="border-right: 1px solid black;">신청번호</th>
+            <th style="border-right: 1px solid black;">유저 이메일</th>
+            <th style="border-right: 1px solid black;">유저 고유번호</th>
+            <th style="border-right: 1px solid black;">신청내역</th>
+            <th style="border-right: 1px solid black;">신청시간</th>
+            <th style="border-right: 1px solid black;">연락처</th>
+            <th>관리</th>
+        </tr>
+        </thead>
+        <tbody id="storeRequests">
+        <tr th:each="storeRequest : ${storeRequests}" th:if="${storeRequest.status == 0}">
+            <td style="border-right: 1px solid black;" th:text="${storeRequest.requestId}"></td>
+            <td style="border-right: 1px solid black;" th:text="${storeRequest.email}"></td>
+            <td style="border-right: 1px solid black;" th:text="${storeRequest.userId}"></td>
+            <td style="border-right: 1px solid black;">
+                <a th:text="${#strings.abbreviate(storeRequest.content, 30)}"
+                   th:href="@{/collectpop/admin/requestDetail/{requestId}(requestId=${storeRequest.requestId})}">신청내용</a>
+            </td>
+            <td style="border-right: 1px solid black;" class="requestTime"
+                th:text="${#temporals.format(storeRequest.requestReg, 'yyyy년 MM월 dd일 HH:mm')}"></td>
+            <td style="border-right: 1px solid black;" th:text="${storeRequest.contactnumber}"></td>
+            <td style="border-right: 1px solid black;">
+                <a th:href="@{/collectpop/admin/approveRequest/{requestId}(requestId=${storeRequest.requestId})}">승인</a>
+                <span style="margin: 0 10px;">|</span>
+                <a th:href="@{/collectpop/admin/rejectRequest/{requestId}(requestId=${storeRequest.requestId})}">반려</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+
+<!-- 1.정렬 유형만 선택시 정렬-->
+<script>
+    $(document).ready(function() {
+        const sortSelector = $("#sort-selector");
+        const requestList = $("#request-list");
+
+        function updateRequestList() {
+            const selectedValue = sortSelector.val();
+
+            $.ajax({
+                url: `/collectpop/admin/filter?status=${selectedValue}`,
+
+                method: "GET",
+                success: function(data) {
+                    requestList.html(data); // 서버로부터 받은 데이터로 등업신청 리스트 업데이트
+                },
+                error: function(error) {
+                    console.error("Error:", error);
+                }
+            });
+        }
+
+        sortSelector.on("change", updateRequestList);
+        updateRequestList(); // 초기 로딩 시 스토어 목록 업데이트
+
+    });
+</script>
+
+
+
+<!-- End Main Content -->
+
+<!-- Footer 붙히기 -->
+<th:block th:replace="layout/footer :: footer"></th:block>
+</body>
+</html>

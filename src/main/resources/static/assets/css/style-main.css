@@ -1,0 +1,17 @@
+@charset "UTF-8";
+
+*{
+    margin: 0 auto;
+}
+.banner{
+    object-fit: cover;
+}
+#firstbox{
+    width: 100%;
+    height:50px;
+}
+
+.swiper-container-parent > .swiper-container{
+    width: 100%;
+    height: 500px;
+}

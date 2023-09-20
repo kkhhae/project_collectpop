@@ -33,7 +33,7 @@ import java.util.UUID;
 @RequestMapping("/collectpop/store/*")
 @Controller
 @RequiredArgsConstructor
-//@SessionAttributes("userId")
+//@SessionAttributes("userId") 주석처리
 public class PopupStoreController {
 
     @Autowired

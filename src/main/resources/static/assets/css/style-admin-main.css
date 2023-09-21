@@ -17,19 +17,23 @@ body{
     padding-top: 15px;
     margin-left: 15px;
 }
+.main-container{
+    margin-top: 60px;
+}
 #main-section-wrap{
     margin-top: 60px;
     position: relative;
 }
 #storeBox {
     width: 1200px;
-    height: 300px;
+    height: 400px;
     background-color: #fff;
     overflow: hidden;
 }
 #storeBox > .store-box{
     display: flex;
     justify-content: space-around;
+    margin-left: 100px;
 }
 .main_exh_sub{
     height: 20px;
@@ -38,10 +42,15 @@ body{
 .main_exh_sub > span{
     font: bold 15px/20px "";
 }
-
+#under-box-wrap{
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    width: 1200px;
+}
 #feedBox{
-    width: 730px;
-    height: 300px;
+    width: 850px;
+    height: 400px;
     background-color: #fff;
     margin-top: 20px;
 }
@@ -51,21 +60,43 @@ body{
 }
 #feedBox > .feed-wrap > .feed-each{
     width: 320px;
-    height: 100px;
+    height: 300px;
 }
-#storeRequestBox{
-    width: 450px;
-    height: 570px;
-    background-color: #fff;
-    position: absolute;
-    top: 320px;
-    right: 45px;
+#feedBox > .feed-wrap > .feed-each > .feedimg-wrap{
+    width: 320px;
+    height: 300px;
 }
+
 #usersBox{
-    width: 730px;
-    height: 230px;
+    width: 150px;
+    height: 400px;
     background-color: #fff;
-    position: absolute;
-    top: 660px;
-    left: 100px;
+    margin-top: 20px;
+}
+.user-info-box{
+    width: 150px;
+    margin-bottom: 5px;
+    border-bottom: 1px solid #EAE6E6;
+}
+.user-info{
+    margin-left: 15px;
+    margin-bottom: 5px;
+    font: 15px "";
+}
+
+#storeRequestBox{
+    width: 150px;
+    height: 400px;
+    margin-top: 20px;
+    background-color: #fff;
+}
+.storeRequest-box{
+    width: 150px;
+    margin-bottom: 5px;
+    border-bottom: 1px solid #EAE6E6;
+}
+.storeRequest-info{
+    margin-left: 15px;
+    margin-bottom: 5px;
+    font: 15px "";
 }

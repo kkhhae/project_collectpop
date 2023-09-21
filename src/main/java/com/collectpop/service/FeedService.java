@@ -37,5 +37,5 @@ public interface FeedService {
 
     Long getFeedUserId(Long fid);
 
-    List<Feed> getFeedByNewest();
+    List<FeedImg> getFeedImg();
 }

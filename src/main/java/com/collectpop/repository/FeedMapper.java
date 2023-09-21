@@ -60,5 +60,5 @@ public interface FeedMapper {
 
     Long getFeedUserId(Long fid);
 
-    List<Feed> getFeedByNewest();
+    List<FeedImg> getFeedImg();
 }

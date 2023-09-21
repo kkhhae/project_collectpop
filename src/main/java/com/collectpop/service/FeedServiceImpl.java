@@ -138,10 +138,9 @@ public class FeedServiceImpl implements FeedService{
     }
 
     @Override
-    public List<Feed> getFeedByNewest() {
-        return feedRepository.getFeedByNewest();
+    public List<FeedImg> getFeedImg() {
+        return feedRepository.getFeedImg();
     }
-
 
     @Override
     public void insertFeed(ImgForm imgForm) throws IOException {

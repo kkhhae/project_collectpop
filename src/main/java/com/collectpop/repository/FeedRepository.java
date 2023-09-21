@@ -56,7 +56,5 @@ public interface FeedRepository {
     void deleteFidOfLikesCheck(Long fid);
 
     Long getFeedUserId(Long fid);
-
-
-    List<Feed> getFeedByNewest();
+    List<FeedImg> getFeedImg();
 }

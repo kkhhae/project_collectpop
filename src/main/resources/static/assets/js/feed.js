@@ -136,7 +136,11 @@ $(document).ready(function (){
                         }
                         writerName2.innerHTML = ""+result.userNickName+" &nbsp; <span id=\"writerContent\" style=\"font: 300 13px '';\">"+result.feedContent + "&nbsp;" + hashTagContent + "</span><br> - "+regDate+"";
                         for (let j = 0; j < viewprofileimg.length; j++) {
-                            viewprofileimg[j].src = "/collectpop/userimages/" + userprofile;
+                            if(userprofile === 'assets/profile.png'){
+                                viewprofileimg[j].src = "/" + userprofile;
+                            }else {
+                                viewprofileimg[j].src = "/collectpop/userimages/" + userprofile;
+                            }
                         }
                         if(result.userCheck){
                             document.getElementById("userCheck").style.display = "block";

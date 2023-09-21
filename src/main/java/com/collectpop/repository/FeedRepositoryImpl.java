@@ -147,8 +147,8 @@ public class FeedRepositoryImpl implements FeedRepository{
     }
 
     @Override
-    public List<Feed> getFeedByNewest() {
-        return feedMapper.getFeedByNewest();
+    public List<FeedImg> getFeedImg() {
+        return feedMapper.getFeedImg();
     }
 
 

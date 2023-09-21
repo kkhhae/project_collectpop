@@ -119,7 +119,12 @@
                         </div>
                     </div>
                     <div id="userInfo">
-                        <img class="profileImg" th:src="@{/collectpop/userimages/__${fileName}__}" alt="사용자 프로필 사진">
+                        <th:block th:if="${fileName == 'assets/profile.png'}">
+                            <img class="profileImg" th:src="@{/__${fileName}__}" alt="사용자 프로필 사진">
+                        </th:block>
+                        <th:block th:if="${fileName != 'assets/profile.png'}">
+                            <img class="profileImg" th:src="@{/collectpop/userimages/__${fileName}__}" alt="사용자 프로필 사진">
+                        </th:block>
                         <span id="userNickName" th:text="${nickName}" th:data-userId="${userId}">닉네임</span>
                     </div>
                     <div id="textareaBox">

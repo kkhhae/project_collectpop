@@ -203,7 +203,7 @@ public class AdminController {
         model.addAttribute("storesSortedByNewest",storesSortedByNewest);
 
         // 최근 올라온 피드
-        List<Feed> getFeedByNewest = feedService.getFeedByNewest();
+        List<FeedImg> getFeedByNewest = feedService.getFeedImg();
         model.addAttribute("getFeedByNewest", getFeedByNewest);
 
         // 최근 가입한 유저
@@ -307,6 +307,15 @@ public class AdminController {
 
         log.info("fileName : {}", fileName);
         String filePath = "file:" + uploadPath + "thumbnail/" + fileName; // 실제 저장 폴더 위치
+        log.info("filePath : {}", filePath);
+        return new UrlResource(filePath);
+    }
+    @ResponseBody
+    @GetMapping("/feedimg/{fileName}") // 웹상 요청 경로(img 태그의 src)
+    public Resource getFeeimg(@PathVariable String fileName) throws MalformedURLException {
+
+        log.info("fileName : {}", fileName);
+        String filePath = "file:" + uploadPath + fileName; // 실제 저장 폴더 위치
         log.info("filePath : {}", filePath);
         return new UrlResource(filePath);
     }

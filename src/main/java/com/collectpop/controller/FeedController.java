@@ -58,8 +58,6 @@ public class FeedController {
         model.addAttribute("fileName",fileName);
         model.addAttribute("userId", userId);
 
-        List<Feed> getFeedByNewest = feedService.getFeedByNewest();
-
         return "feed/feed";
     }
 

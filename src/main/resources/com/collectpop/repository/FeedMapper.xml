@@ -29,6 +29,9 @@
         where r > (#{page} - 1) * #{feedSize}
         ]]>
     </select>
+    <select id="getFeedImg" resultType="FeedImg">
+        select * from feedImg order by fiid desc
+    </select>
     <select id="getFidOfFeedImg" resultType="FeedImg">
         select * from feedImg where fid = #{fid}
     </select>
@@ -123,8 +126,4 @@
         delete from likesCheck where fid = #{fid}
     </delete>
 
-    <select id="getFeedByNewest" resultType="com.collectpop.domain.Feed">
-        SELECT * FROM feed
-        ORDER BY regDate desc
-    </select>
 </mapper>

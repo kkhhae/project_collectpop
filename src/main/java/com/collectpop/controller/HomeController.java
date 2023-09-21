@@ -119,6 +119,10 @@ public class HomeController {
         return new UrlResource(filePath);
     }
 
-
+    //에러페이지
+    @GetMapping("/error")
+    public String errorPage(){
+        return"errorPage";
+    }
 
 }

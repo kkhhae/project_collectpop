@@ -1,6 +1,7 @@
 package com.collectpop.service;
 
 import com.collectpop.domain.*;
+import com.collectpop.dto.ApiCode;
 import com.collectpop.dto.Pager;
 import com.collectpop.repository.UsersMapper;
 import com.collectpop.repository.UsersRepository;
@@ -28,6 +29,7 @@ public class UsersServiceImpl implements UsersService {
 
     private final UsersRepository usersRepository;
     private final PasswordEncoder passwordEncoder;
+    private String apikey = ApiCode.KAKAOLOGINCODE.getAbbreviation();
 //    private final IACDAO
 
     //로그인
@@ -159,7 +161,7 @@ public class UsersServiceImpl implements UsersService {
             sb.append("grant_type=authorization_code");
 
             //배포 및 공유 시 client_id는 비공개로
-            sb.append("&client_id=b5c744c7e75dfd76ba65c844a489ff44"); // REST_API키 본인이 발급받은 key 넣어주기
+            sb.append("&client_id=").append(apikey); // REST_API키 본인이 발급받은 key 넣어주기
             sb.append("&redirect_uri=http://localhost:8080/collectpop/users/kakaoLogin"); // REDIRECT_URI 본인이 설정한 주소 넣어주기
 
             sb.append("&code=" + authorize_code);

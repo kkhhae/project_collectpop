@@ -47,7 +47,7 @@ public class SecurityConfig  {
                 .antMatchers("/collectpop/admin/mainm/**").hasAuthority("ROLE_ADMIN") //ROLE_ADMIN이라는 룰 가진 사용자만 admin 접속가능
                 .antMatchers("/collectpop/admin/rejectRequest/**").hasAuthority("ROLE_ADMIN") //ROLE_ADMIN이라는 룰 가진 사용자만 admin 접속가능
                 .antMatchers("/collectpop/admin/requestDetail/**").hasAuthority("ROLE_ADMIN") //ROLE_ADMIN이라는 룰 가진 사용자만 admin 접속가능
-                //.antMatchers("/collectpop/admin/userList/**").hasAuthority("ROLE_ADMIN") //ROLE_ADMIN이라는 룰 가진 사용자만 admin 접속가능
+                .antMatchers("/collectpop/admin/userList/**").hasAuthority("ROLE_ADMIN") //ROLE_ADMIN이라는 룰 가진 사용자만 admin 접속가능
                 .antMatchers("/collectpop/users/myList/**").hasAuthority("ROLE_ACTIVE") //ROLE_ADMIN이라는 룰 가진 사용자만 admin 접속가능
 
                 .anyRequest().permitAll() //나머지는 모든요청을 다 허용하겠다 설정
@@ -68,7 +68,9 @@ public class SecurityConfig  {
                 .defaultSuccessUrl("/collectpop/") //로그인 성공 시 경로
                 .failureUrl("/collectpop/error") //로그인 실패 시 경로
                 .successHandler(new UserSuccessHandler()) //로그인성공시 인증연결 자동실행
-
+                .and()
+                .exceptionHandling()
+                .accessDeniedPage("/collectpop/error")
                 .and()
 
                 //로그아웃

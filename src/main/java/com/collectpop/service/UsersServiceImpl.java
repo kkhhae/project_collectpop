@@ -3,9 +3,7 @@ package com.collectpop.service;
 import com.collectpop.domain.*;
 import com.collectpop.dto.ApiCode;
 import com.collectpop.dto.Pager;
-import com.collectpop.repository.UsersMapper;
 import com.collectpop.repository.UsersRepository;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +18,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

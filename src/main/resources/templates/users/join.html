@@ -240,11 +240,12 @@
                   console.log("data : "+data);
                   EmailConfirm(data, $memailconfirm, $memailconfirmTxt);
 
-               },
-                error: function (e) {
-                    alert("해당 이메일로 인증번호 발송이 완료되었습니다. \n 확인부탁드립니다.")
-                    console.log("e : "+e);
-                }
+                 error{
+                 alert("해당 이메일로 인증번호 발송이 완료되었습니다. \n 확인부탁드립니다.")
+                 console.log("data : "+data);
+                 EmailConfirm(data, $memailconfirm, $memailconfirmTxt);
+                 }
+               }
             })
         }
      })

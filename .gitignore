@@ -22,6 +22,7 @@ bin/
 *.iws
 *.iml
 *.ipr
+src/main/java/com/collectpop/dto/ApiCode.java
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/

@@ -8,8 +8,26 @@
 <!--body-->
 <body data-spy="scroll" data-target=".onpage-navigation" data-offset="60">
 <!-- body쪽 header처럼 되어 있는 내용들 -->
-<th:block th:replace="layout/startContent :: startContent"></th:block>
-
+<nav class="navbar navbar-custom navbar-fixed-top clearfix" role="navigation">
+    <div class="container">
+        <!-- 좌측 로고 -->
+        <div class="navbar-header">
+            <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#custom-collapse"><span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span>
+                <span class="icon-bar"></span></button><a class="navbar-brand" th:href="@{/collectpop/admin/mainm}">COLLECTPOPS<span class="logomin">admin</span></a>
+        </div>
+        <!-- 우측 헤더 목록-->
+        <div class="collapse navbar-collapse" id="custom-collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li class=""><a class="" th:href="@{/collectpop/admin/mainm}" >관리자 메인</a> </li>
+                <li class=""><a class="" th:href="@{/collectpop/admin/requestList}" >등업 리스트</a></li>
+                <li class=""><a class="" th:href="@{/collectpop/admin/userList}" >유저 관리</a></li>
+                <li class=""><a class="" th:href="@{/collectpop/admin/declaration}" >신고 관리</a></li>
+                <li class=""><a class="" th:href="@{/collectpop/admin/banner}" >배너 관리</a></li>
+                <li class=""><a class="" th:href="@{/collectpop}">메인으로</a> </li>
+            </ul>
+        </div>
+    </div>
+</nav>
 <!-- Main Content들어갈 부분 -->
 
 <section class="module bg-dark-30 about-page-header" data-background="assets/images/about_bg.jpg">

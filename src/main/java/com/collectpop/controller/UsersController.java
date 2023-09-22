@@ -86,7 +86,7 @@ public class UsersController {
         String uuid = UUID.randomUUID().toString();
         String extension = imageFile.getOriginalFilename().substring(imageFile.getOriginalFilename().lastIndexOf(".")); // 파일 확장자명 가져오기
         String fileName = uuid + "_" + extension;
-        File destFile = new File(uploadPath + "userImg/" + fileName); // F:\\ljm\\springboot\\upload\\thumbnail 에 저장
+        File destFile = new File(uploadPath + fileName); // F:\\ljm\\springboot\\upload\\thumbnail 에 저장
         imageFile.transferTo(destFile);
         return fileName;
     }

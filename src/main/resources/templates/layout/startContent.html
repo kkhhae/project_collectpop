@@ -53,15 +53,6 @@
                         <li class=""><a class="" th:href="@{/collectpop/map}" >지도</a></li>
                         <li class=""><a class="" th:href="@{/collectpop/feed}" >피드</a></li>
                         <li class=""><a class="" th:href="@{/collectpop/users/login}">로그인</a></li>
-
-                        <!--
-                         <li class="dropdown"><a class="dropdown-toggle" href="#" data-toggle="dropdown">dropdownx</a></li>
-                            <ul class="dropdown-menu">
-                                <li><a href="">Default</a></li>
-                                <li><a href="">One Page</a></li>
-                                <li><a href="">Agency</a></li>
-                            </ul>
-                        -->
                     </ul>
                 </div>
             </div>
@@ -85,13 +76,16 @@
                 </div>
 
                 <!-- 우측 헤더 목록-->
-                <div class="collapse navbar-collapse" id="custom-collapse" >
+                <div class="collapse navbar-collapse" id="custom-collapse">
                     <ul class="nav navbar-nav navbar-right" style="display:inline-block;">
                         <li class=""><a class="" th:href="@{/collectpop/store/storeList}" >팝업스토어</a></li>
                         <li class=""><a class="" th:href="@{/collectpop/map}" >지도</a></li>
                         <li class=""><a class="" th:href="@{/collectpop/feed}" >피드</a></li>
                         <li class=""><a class=""  th:href="@{/collectpop/users/mypage/{id}(id=${users.userId})}" >마이페이지</a></li>
                         <li class=""><a class="" th:href="@{/logout}">로그아웃</a></li>
+                        <li th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                            <a class="" th:href="@{/collectpop/admin/mainm}">관리자 페이지</a>
+                        </li>
                     </ul>
                 </div>
             </div>

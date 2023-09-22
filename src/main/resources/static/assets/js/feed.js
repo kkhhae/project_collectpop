@@ -317,11 +317,7 @@ $(document).ready(function (){
             nextBtn.addEventListener("click", function (e){
                 num++;
                 viewImgBox.style.left = -1 * (100 * 6) * num + "px";
-                if(mediaQuery.matches){
-                    viewImgBox2.style = -1 * (10 * 37) * num + "px";
-                }else {
-                    viewImgBox2.style.left = -1 * (10 * 54) * num + "px";
-                }
+                viewImgBox2.style.left = -1 * (10 * 54) * num + "px";
                 console.log(num);
                 console.log(viewImgBox.style.left);
                 console.log(count);

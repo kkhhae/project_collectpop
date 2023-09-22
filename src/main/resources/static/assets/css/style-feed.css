@@ -401,7 +401,7 @@
 }
 .viewFeedImg{
     width: 600px;
-    height: 800px;
+    height: 100%;
     object-fit: cover;
 }
 .viewFeedImg2{
@@ -547,8 +547,10 @@
     }
     .viewFeedImg2{
         display: block;
+        flex: 0 0 auto;
         width: 540px;
         height: 400px;
+        object-fit: cover;
     }
     #viewImgBox2{
         display: flex;

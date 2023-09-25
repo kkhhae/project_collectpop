@@ -30,7 +30,7 @@ public interface UsersMapper {
     Users getUsername(String username);
 
     //email로 회원정보 찾기(username)
-    Users findByIdWithEmail(String email);
+    List<Users> findByIdWithEmail(String email);
 
     //username으로 회원정보 찾기(password)
     Users findEmailandName(@Param ("username") String username, @Param("email") String email);

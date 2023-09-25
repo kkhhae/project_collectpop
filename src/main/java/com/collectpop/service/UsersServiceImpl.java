@@ -56,7 +56,7 @@ public class UsersServiceImpl implements UsersService {
 
     //email로 유저찾기
     @Override
-    public Users findbyIdWithEmail(String email) {
+    public List<Users> findbyIdWithEmail(String email) {
         log.info("findEmail call");
         return usersRepository.findByIdWithEmail(email);
     }

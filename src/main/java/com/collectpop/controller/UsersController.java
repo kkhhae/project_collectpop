@@ -251,10 +251,10 @@ public class UsersController {
     @PostMapping("/findUsername")
     public String findIdPro(Model model, @ModelAttribute Users users,
                             @RequestParam("email") String email) {
-        Users findEmail = usersService.findbyIdWithEmail(email);
+        List<Users> findEmail = usersService.findbyIdWithEmail(email);
         log.info("find email DB : {}", findEmail);
 
-        if (findEmail != null && findEmail.getEmail().equals(email)) {
+        if (findEmail != null) {
             //이메일 인증하고 찾아오기, 이메일 중복가입 불가하면 따로 비교처리 안해도될듯?싶습니다.
             log.info("찾기성공");
             model.addAttribute("users", findEmail);
@@ -419,18 +419,23 @@ public class UsersController {
     //비활성화 계정 풀기 (사용자가 입력한 이메일값이랑 기존에 저장되어있던 유저의 이메일 값 비교)
     @PostMapping("/checkSelf")
     public String checkSelf(@ModelAttribute Users users, @RequestParam("email") String email){
-        Users findUser = usersService.findbyIdWithEmail(users.getEmail());
+        List<Users> findUser = usersService.findbyIdWithEmail(users.getEmail());
         log.info("find email user : {}", findUser);
 
         if(findUser == null){
             log.info("이메일이 틀립니다.");
             return "redirect:/collectpop/error";
 
-        }
-        usersService.online(findUser);
-        log.info("success email  " + email + " << >> " + findUser.getEmail());
+        }else {
+            findUser.forEach(user -> {
+                if (user.getRole_online().toString().equals("DISABLED")) {
+                    usersService.online(user);
+                }
+            });
 
-        return "redirect:/collectpop/main";
+            return "redirect:/logout";
+
+        }
     }
 
     // 등업 신청 관리 리스트 페이지 요청

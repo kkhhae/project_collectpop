@@ -24,7 +24,7 @@ public interface UsersRepository {
     Users findById(Long userId);
 
     //email로 회원정보 찾기
-    Users findByIdWithEmail(String email);
+    List<Users> findByIdWithEmail(String email);
 
     //username으로 회원정보 찾기
     Users findEmailandName(@Param("username") String username, @Param("email") String email);

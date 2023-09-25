@@ -24,7 +24,7 @@ public interface UsersService {
     Users findById(Long userId);
 
     //이메일로 아이디찾기
-    Users findbyIdWithEmail(String email);
+    List<Users> findbyIdWithEmail(String email);
 
     //아이디로 유저찾기
     Users findEmailandName(@Param("username") String username, @Param("email") String email);

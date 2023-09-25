@@ -46,7 +46,7 @@ public class UsersRepositoryImpl implements UsersRepository {
     }
 
     @Override
-    public Users findByIdWithEmail(String email) {
+    public List<Users> findByIdWithEmail(String email) {
         log.info("findEmail rep : {}", email);
         return usersMapper.findByIdWithEmail(email);
     }

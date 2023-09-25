@@ -17,8 +17,8 @@
                 <div class="col-sm-5 col-sm-offset-1 mb-sm-40" style="width:80%;">
                     <h4 class="font-alt">아이디찾기 결과</h4>
                     <hr class="divider-w mb-10">
-                    <div class="form-group">결과 :
-                        <input class="form-control" type="text" th:value="${users.username}" readonly/>
+                    <div class="form-group" th:each="user : ${users}">결과 :
+                        <input class="form-control" type="text" th:value="${user.getUsername()}" readonly/>
                     </div>
                     <div class="form-group"><a th:href="@{/collectpop/users/findPassword}">비밀번호 찾기</a></div>
                     <div class="form-group"><a th:href="@{/collectpop/users/join}">회원가입</a></div>
